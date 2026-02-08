@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "Offtube.Test.Console": {
+      "commandName": "Project"
+    },
+    "Container (Dockerfile)": {
+      "commandName": "Docker"
+    }
+  }
+}
