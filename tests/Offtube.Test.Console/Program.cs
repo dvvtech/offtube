@@ -4,7 +4,7 @@ namespace YtDlpDownloader
 {
     class Program
     {
-        private const string PROXY_URL = "http://vova01:1q2w3e$$$$@194.156.103.12:1300";
+        private const string PROXY_URL = "";
 
         static async Task Main(string[] args)
         {
@@ -75,32 +75,7 @@ namespace YtDlpDownloader
 
             await Task.WhenAll(outputTask, errorTask);
             await process.WaitForExitAsync();
-        }
-
-        static void ConfigureProxyEnvironmentVariables(System.Collections.Specialized.StringDictionary env)
-        {
-            // Устанавливаем переменные окружения для прокси
-            if (PROXY_URL.StartsWith("http://"))
-            {
-                env["HTTP_PROXY"] = PROXY_URL;
-                env["HTTPS_PROXY"] = PROXY_URL.Replace("http://", "https://");
-                env["http_proxy"] = PROXY_URL.ToLower();
-                env["https_proxy"] = PROXY_URL.Replace("http://", "https://").ToLower();
-            }
-            else if (PROXY_URL.StartsWith("https://"))
-            {
-                env["HTTP_PROXY"] = PROXY_URL.Replace("https://", "http://");
-                env["HTTPS_PROXY"] = PROXY_URL;
-                env["http_proxy"] = PROXY_URL.Replace("https://", "http://").ToLower();
-                env["https_proxy"] = PROXY_URL.ToLower();
-            }
-            else if (PROXY_URL.StartsWith("socks"))
-            {
-                // SOCKS прокси
-                env["ALL_PROXY"] = PROXY_URL;
-                env["all_proxy"] = PROXY_URL.ToLower();
-            }
-        }
+        }        
 
         static string BuildArguments(string url, string outputPath, string quality)
         {
@@ -111,6 +86,8 @@ namespace YtDlpDownloader
             args += "--no-playlist "; // Не скачивать плейлист, только одно видео
             args += "--progress ";    // Показывать прогресс
             args += "--no-warnings "; // Скрыть предупреждения
+
+            args += $"--proxy \"{PROXY_URL}\" ";
 
             // Если выбрано только аудио
             if (quality == "bestaudio")
