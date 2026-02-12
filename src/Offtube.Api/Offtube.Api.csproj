@@ -11,7 +11,8 @@
 
   <ItemGroup>
 	  <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="9.0.0" />
-	  <PackageReference Include="Microsoft.AspNetCore.SignalR.Client.Core" Version="9.0.0" />    
+	  <PackageReference Include="Microsoft.AspNetCore.SignalR.Client.Core" Version="9.0.0" />
+	  <PackageReference Include="Swashbuckle.AspNetCore" Version="10.1.0" />    
   </ItemGroup>
 
 </Project>

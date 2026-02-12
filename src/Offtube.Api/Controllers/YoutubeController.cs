@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
+using Offtube.Api.Hub;
 using Offtube.Api.Models;
 using Offtube.Api.Services;
-using System.Diagnostics;
 
 namespace Offtube.Api.Controllers
 {
@@ -11,14 +11,16 @@ namespace Offtube.Api.Controllers
     public class YoutubeController : ControllerBase
     {
         private readonly IYoutubeDownloadService _downloadService;
-        //private readonly IHubContext<DownloadHub> _hubContext;
+        private readonly IHubContext<DownloadHub> _hubContext;
         private readonly ILogger<YoutubeController> _logger;
 
         public YoutubeController(
             IYoutubeDownloadService downloadService,
-            //IHubContext<DownloadHub> hubContext,
+            IHubContext<DownloadHub> hubContext,
             ILogger<YoutubeController> logger)
         {
+            _downloadService = downloadService;
+            _hubContext = hubContext;
             _logger = logger;
         }
 
@@ -27,15 +29,18 @@ namespace Offtube.Api.Controllers
         {
             //var args = "yt-dlp https://www.youtube.com/watch?v=m1Dk0qMSDEg";
             request.Url = "https://www.youtube.com/watch?v=m1Dk0qMSDEg";
+            request.Quality = "best[height <= 480]";
 
             var downloadId = Guid.NewGuid().ToString();
-            var tempPath = Path.Combine(Path.GetTempPath(), "youtube_downloads", downloadId);
+            var tt = Path.GetTempPath();
+            //var tempPath = Path.Combine(Path.GetTempPath(), "youtube_downloads", downloadId);
+            var tempPath = Path.Combine(Directory.GetCurrentDirectory(), "youtube_downloads", downloadId);
 
             var progress = new Progress<ProgressInfo>(async info =>
             {
                 // Отправляем прогресс через SignalR
-                //await _hubContext.Clients.Group(downloadId)
-                //    .SendAsync("ReceiveProgress", info);
+                await _hubContext.Clients.Group(downloadId)
+                    .SendAsync("ReceiveProgress", info);
             });
 
             try
@@ -63,12 +68,12 @@ namespace Offtube.Api.Controllers
                 memory.Position = 0;
 
                 // Отправляем информацию о завершении
-                //await _hubContext.Clients.Group(downloadId)
-                //    .SendAsync("DownloadComplete", new
-                //    {
-                //        FileName = Path.GetFileName(file),
-                //        FileSize = memory.Length
-                //    });
+                await _hubContext.Clients.Group(downloadId)
+                    .SendAsync("DownloadComplete", new
+                    {
+                        FileName = Path.GetFileName(file),
+                        FileSize = memory.Length
+                    });
 
                 // Удаляем временные файлы после отправки
                 Response.OnCompleted(async () =>
@@ -97,14 +102,6 @@ namespace Offtube.Api.Controllers
             }
         }
 
-        private async Task ReadStream(StreamReader reader)
-        {
-            while (!reader.EndOfStream)
-            {
-                var line = await reader.ReadLineAsync();
-                if (!string.IsNullOrWhiteSpace(line))
-                    Console.WriteLine(line);
-            }
-        }
+        
     }
 }

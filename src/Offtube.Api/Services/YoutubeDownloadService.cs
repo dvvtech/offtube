@@ -11,13 +11,15 @@ namespace Offtube.Api.Services
 
         public YoutubeDownloadService(IWebHostEnvironment env)
         {
-            _ytDlpPath = Path.Combine(env.ContentRootPath, "yt-dlp.exe");
+            _ytDlpPath = "C:\\DVV\\Github\\Offtube\\src\\Offtube.Api\\bin\\Debug\\net9.0\\yt-dlp.exe";//Path.Combine(env.ContentRootPath, "yt-dlp.exe");
         }
 
         public async Task DownloadVideoAsync(string url, string quality, string outputPath,
             IProgress<ProgressInfo> progress, CancellationToken cancellationToken)
         {
             Directory.CreateDirectory(outputPath);
+
+            outputPath = "vid";
 
             var arguments = BuildArguments(url, outputPath, quality);
 
@@ -88,7 +90,7 @@ namespace Offtube.Api.Services
                 var percentMatch = System.Text.RegularExpressions.Regex.Match(line, @"(\d+\.?\d*)%");
                 if (percentMatch.Success)
                 {
-                    progressInfo.Percentage = (int)double.Parse(percentMatch.Groups[1].Value);
+                    progressInfo.Percentage = (int)double.Parse(percentMatch.Groups[1].Value.Replace(".",","));
                     progressInfo.Status = "Загрузка...";
                 }
 
