@@ -1,0 +1,122 @@
+﻿using Offtube.Api.Models;
+using System.Diagnostics;
+using System.Text;
+
+namespace Offtube.Api.Services
+{
+    public class YoutubeDownloadService : IYoutubeDownloadService
+    {
+        private const string PROXY_URL = "";
+        private readonly string _ytDlpPath;
+
+        public YoutubeDownloadService(IWebHostEnvironment env)
+        {
+            _ytDlpPath = Path.Combine(env.ContentRootPath, "yt-dlp.exe");
+        }
+
+        public async Task DownloadVideoAsync(string url, string quality, string outputPath,
+            IProgress<ProgressInfo> progress, CancellationToken cancellationToken)
+        {
+            Directory.CreateDirectory(outputPath);
+
+            var arguments = BuildArguments(url, outputPath, quality);
+
+            var process = new Process
+            {
+                StartInfo = new ProcessStartInfo
+                {
+                    FileName = _ytDlpPath,
+                    Arguments = arguments,
+                    UseShellExecute = false,
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = true,
+                    CreateNoWindow = true,
+                    StandardOutputEncoding = Encoding.UTF8,
+                    StandardErrorEncoding = Encoding.UTF8
+                }
+            };
+
+            process.ErrorDataReceived += (sender, e) =>
+            {
+                if (!string.IsNullOrEmpty(e.Data))
+                    ParseProgress(e.Data, progress);
+            };
+
+            process.OutputDataReceived += (sender, e) =>
+            {
+                if (!string.IsNullOrEmpty(e.Data))
+                    ParseProgress(e.Data, progress);
+            };
+
+            process.Start();
+            process.BeginErrorReadLine();
+            process.BeginOutputReadLine();
+
+            await process.WaitForExitAsync(cancellationToken);
+
+            if (process.ExitCode != 0)
+                throw new Exception("Ошибка при скачивании видео");
+        }
+
+        private string BuildArguments(string url, string outputPath, string quality)
+        {
+            var outputTemplate = Path.Combine(outputPath, "%(title)s.%(ext)s");
+
+            var args = $"-o \"{outputTemplate}\" ";
+            args += $"-f \"{quality}\" ";
+            args += "--no-playlist ";
+            args += "--newline ";  // Для лучшего парсинга прогресса
+            args += "--no-warnings ";
+            args += $"--proxy \"{PROXY_URL}\" ";
+
+            if (quality == "bestaudio")
+                args += "-x --audio-format mp3 ";
+
+            args += $"\"{url}\"";
+
+            return args;
+        }
+
+        private void ParseProgress(string line, IProgress<ProgressInfo> progress)
+        {
+            // Парсинг прогресса из вывода yt-dlp
+            var progressInfo = new ProgressInfo { Status = line };
+
+            // Пример парсинга: [download]   0.0% of ~10.23MiB at 0B/s ETA Unknown
+            if (line.Contains("[download]") && line.Contains("%"))
+            {
+                var percentMatch = System.Text.RegularExpressions.Regex.Match(line, @"(\d+\.?\d*)%");
+                if (percentMatch.Success)
+                {
+                    progressInfo.Percentage = (int)double.Parse(percentMatch.Groups[1].Value);
+                    progressInfo.Status = "Загрузка...";
+                }
+
+                // Скорость
+                var speedMatch = System.Text.RegularExpressions.Regex.Match(line, @"at\s+([\d\.]+\w?/s)");
+                if (speedMatch.Success)
+                {
+                    progressInfo.Speed =  double.Parse(speedMatch.Groups[1].Value);
+                }
+
+                // ETA
+                var etaMatch = System.Text.RegularExpressions.Regex.Match(line, @"ETA\s+(\d+:\d+)");
+                if (etaMatch.Success)
+                    progressInfo.Eta = etaMatch.Groups[1].Value;
+            }
+            // Название файла
+            else if (line.Contains("[download] Destination:"))
+            {
+                progressInfo.FileName = line.Replace("[download] Destination:", "").Trim();
+                progressInfo.Status = "Начало загрузки...";
+            }
+            else if (line.Contains("[ExtractAudio] Destination:"))
+            {
+                progressInfo.FileName = line.Replace("[ExtractAudio] Destination:", "").Trim();
+                progressInfo.Status = "Конвертация...";
+            }
+
+            progress.Report(progressInfo);
+        }
+    }
+}
