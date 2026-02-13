@@ -1,4 +1,5 @@
-﻿using Offtube.Api.Services;
+﻿using Offtube.Api.Configuration;
+using Offtube.Api.Services;
 
 namespace Offtube.Api.AppStart
 {
@@ -18,12 +19,19 @@ namespace Offtube.Api.AppStart
                 _builder.Services.AddSwaggerGen();
             }
 
+            InitConfigs();
+
             // Добавляем SignalR
             _builder.Services.AddSignalR();
 
             // Регистрируем сервис
             _builder.Services.AddScoped<IYoutubeDownloadService, YoutubeDownloadService>();
             _builder.Services.AddHttpContextAccessor();
+        }
+
+        private void InitConfigs()
+        {
+            _builder.Services.Configure<AppConfig>(_builder.Configuration.GetSection(AppConfig.SectionName));
         }
     }
 }

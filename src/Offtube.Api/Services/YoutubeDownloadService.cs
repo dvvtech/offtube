@@ -1,16 +1,21 @@
-﻿using Offtube.Api.Models;
+﻿using Microsoft.Extensions.Options;
+using Offtube.Api.Configuration;
+using Offtube.Api.Models;
 using System.Diagnostics;
 using System.Text;
 
 namespace Offtube.Api.Services
 {
     public class YoutubeDownloadService : IYoutubeDownloadService
-    {
-        private const string PROXY_URL = "";
+    {        
+        private readonly string _proxyUrl;
         private readonly string _ytDlpPath;
 
-        public YoutubeDownloadService(IWebHostEnvironment env)
+        public YoutubeDownloadService(
+            IOptions<AppConfig> options,
+            IWebHostEnvironment env)
         {
+            _proxyUrl = options.Value.ProxyUrl;
             _ytDlpPath = "C:\\DVV\\Github\\Offtube\\src\\Offtube.Api\\bin\\Debug\\net9.0\\yt-dlp.exe";//Path.Combine(env.ContentRootPath, "yt-dlp.exe");
         }
 
@@ -69,7 +74,7 @@ namespace Offtube.Api.Services
             args += "--no-playlist ";
             args += "--newline ";  // Для лучшего парсинга прогресса
             args += "--no-warnings ";
-            args += $"--proxy \"{PROXY_URL}\" ";
+            args += $"--proxy \"{_proxyUrl}\" ";
 
             if (quality == "bestaudio")
                 args += "-x --audio-format mp3 ";
