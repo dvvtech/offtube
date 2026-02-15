@@ -1,5 +1,5 @@
 services:
-  mpp_tests_api:
+  offtube_api:
     container_name: offtube-api-container
     build:
       context: ..
