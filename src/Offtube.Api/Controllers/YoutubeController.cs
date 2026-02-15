@@ -6,7 +6,7 @@ using Offtube.Api.Services;
 
 namespace Offtube.Api.Controllers
 {
-    [Route("api/youtube")]
+    [Route("video")]
     [ApiController]
     public class YoutubeController : ControllerBase
     {
@@ -103,6 +103,11 @@ namespace Offtube.Api.Controllers
             }
         }
 
-        
+        [HttpGet("test")]
+        public async Task<string> Test()
+        {
+            _logger.LogInformation("call test");            
+            return "123";
+        }
     }
 }
