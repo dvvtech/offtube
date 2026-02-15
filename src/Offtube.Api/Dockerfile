@@ -33,5 +33,6 @@ COPY --from=publish /app/publish .
 COPY ["src/Offtube.Api/Tools/yt-dlp_linux", "./Tools/yt-dlp"]
 
 RUN chmod +x ./Tools/yt-dlp
+RUN ls -la ./Tools/
 
 ENTRYPOINT ["dotnet", "Offtube.Api.dll"]
