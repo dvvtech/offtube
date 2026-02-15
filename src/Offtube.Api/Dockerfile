@@ -30,7 +30,7 @@ WORKDIR /app
 #  опируем опубликованное приложение
 COPY --from=publish /app/publish .
 
-COPY ["Tools/yt-dlp_linux", "./Tools/yt-dlp"]
+COPY ["src/Offtube.Api/Tools/yt-dlp_linux", "./Tools/yt-dlp"]
 
 RUN chmod +x ./Tools/yt-dlp
 
