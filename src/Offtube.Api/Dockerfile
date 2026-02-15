@@ -34,5 +34,6 @@ COPY ["src/Offtube.Api/Tools/yt-dlp_linux", "./Tools/yt-dlp"]
 
 RUN chmod +x ./Tools/yt-dlp
 RUN ls -la ./Tools/
+USER $APP_UID
 
 ENTRYPOINT ["dotnet", "Offtube.Api.dll"]
