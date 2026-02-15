@@ -26,5 +26,12 @@ RUN dotnet publish "./Offtube.Api.csproj" -c $BUILD_CONFIGURATION -o /app/publis
 # This stage is used in production or when running from VS in regular mode (Default when not using the Debug configuration)
 FROM base AS final
 WORKDIR /app
+
+#  опируем опубликованное приложение
 COPY --from=publish /app/publish .
+
+COPY ["Tools/yt-dlp_linux", "./Tools/yt-dlp"]
+
+RUN chmod +x ./Tools/yt-dlp
+
 ENTRYPOINT ["dotnet", "Offtube.Api.dll"]
