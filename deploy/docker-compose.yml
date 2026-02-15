@@ -1,0 +1,25 @@
+services:
+  mpp_tests_api:
+    container_name: offtube-api-container
+    build:
+      context: ..
+      dockerfile: src/Offtube.Api/Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Prod
+      - AppConfig__ProxyUrl=${PROXY_URL}      
+      
+    restart: unless-stopped    
+    networks:
+      - public-network
+    labels:      
+      - "traefik.enable=true"      
+      - "traefik.http.routers.offtube-api.rule=Host(`api.cloud-platform.pro`) && PathPrefix(`/offtube`)"
+      - "traefik.http.routers.offtube-api.entrypoints=websecure"      
+      - "traefik.http.routers.offtube-api.tls.certresolver=letsencrypt"     
+      - "traefik.http.services.offtube-api.loadbalancer.server.port=8080"
+      - "traefik.http.middlewares.offtube-stripprefix.stripprefix.prefixes=/offtube"
+      - "traefik.http.routers.offtube-api.middlewares=offtube-stripprefix"
+
+networks:
+  public-network:
+    external: true
