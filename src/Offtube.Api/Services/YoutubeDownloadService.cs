@@ -44,8 +44,6 @@ namespace Offtube.Api.Services
         {
             Directory.CreateDirectory(outputPath);
 
-            outputPath = "vid";
-
             var arguments = BuildArguments(url, outputPath, quality);
 
             var process = new Process

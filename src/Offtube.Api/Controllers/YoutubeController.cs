@@ -32,9 +32,7 @@ namespace Offtube.Api.Controllers
             request.Url = "https://www.youtube.com/watch?v=uVOzD-GX0kM";
             request.Quality = "best[height <= 480]";
 
-            var downloadId = Guid.NewGuid().ToString();
-            var tt = Path.GetTempPath();
-            //var tempPath = Path.Combine(Path.GetTempPath(), "youtube_downloads", downloadId);
+            var downloadId = Guid.NewGuid().ToString();            
             var tempPath = Path.Combine(Directory.GetCurrentDirectory(), "youtube_downloads", downloadId);
 
             var progress = new Progress<ProgressInfo>(async info =>
@@ -93,12 +91,14 @@ namespace Offtube.Api.Controllers
 
                 return File(memory, contentType, Path.GetFileName(file));
             }
-            catch (OperationCanceledException)
+            catch (OperationCanceledException ex)
             {
+                _logger.LogError("Запрос отменен клиентом");
                 return StatusCode(499, "Запрос отменен клиентом");
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "Ошибка");
                 return StatusCode(500, $"Ошибка: {ex.Message}");
             }
         }
@@ -106,11 +106,15 @@ namespace Offtube.Api.Controllers
         [HttpGet("test")]
         public async Task<string> Test()
         {
-            var path = Path.Combine(Directory.GetCurrentDirectory(), "Tools", "yt-dlp");
+            var downloadId = Guid.NewGuid().ToString();
+            var tempPath = Path.Combine(Directory.GetCurrentDirectory(), "youtube_downloads", downloadId);
+            Directory.CreateDirectory(tempPath);
+
+            //var path = Path.Combine(Directory.GetCurrentDirectory(), "Tools", "yt-dlp");
             //var res = Directory.Exists(path);
-            var hasFile = System.IO.File.Exists(path);
+            //var hasFile = System.IO.File.Exists(path);
             _logger.LogInformation("call test");            
-            return path + " 777 " + hasFile;
+            return "123";
         }
     }
 }
