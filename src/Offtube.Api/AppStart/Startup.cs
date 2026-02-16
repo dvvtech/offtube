@@ -1,4 +1,5 @@
-﻿using Offtube.Api.Configuration;
+﻿using Offtube.Api.AppStart.Extensions;
+using Offtube.Api.Configuration;
 using Offtube.Api.Services;
 
 namespace Offtube.Api.AppStart
@@ -23,6 +24,10 @@ namespace Offtube.Api.AppStart
             if (_builder.Environment.IsDevelopment())
             {
                 _builder.Services.AddSwaggerGen();
+            }
+            else
+            {
+                _builder.Services.ConfigureCors();
             }
 
             InitConfigs();
