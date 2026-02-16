@@ -16,7 +16,9 @@
                               .AllowCredentials() // Разрешить куки + signal r
                               .AllowAnyHeader()
                               .AllowAnyMethod()
-                              .SetIsOriginAllowedToAllowWildcardSubdomains();
+                              .SetIsOriginAllowed(origin => true);
+                        //.SetIsOriginAllowedToAllowWildcardSubdomains();
+
                     });
 
                 options.AddPolicy(AllowAllPolicy, policy =>
@@ -25,7 +27,8 @@
                           .AllowCredentials() // Разрешить куки + signal r
                           .AllowAnyMethod()  // Разрешить любые HTTP-методы (GET, POST, PUT и т. д.)
                           .AllowAnyHeader() // Разрешить любые заголовки
-                          .SetIsOriginAllowedToAllowWildcardSubdomains();
+                          .SetIsOriginAllowed(origin => true);
+                    //.SetIsOriginAllowedToAllowWildcardSubdomains();
                 });
             });
         }
