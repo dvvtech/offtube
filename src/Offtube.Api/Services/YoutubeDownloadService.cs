@@ -19,8 +19,12 @@ namespace Offtube.Api.Services
             _ytDlpPath = "C:\\DVV\\Github\\Offtube\\src\\Offtube.Api\\bin\\Debug\\net9.0\\yt-dlp.exe";//Path.Combine(env.ContentRootPath, "yt-dlp.exe");
         }
 
-        public async Task DownloadVideoAsync(string url, string quality, string outputPath,
-            IProgress<ProgressInfo> progress, CancellationToken cancellationToken)
+        public async Task DownloadVideoAsync(
+            string url,
+            string quality,
+            string outputPath,
+            IProgress<ProgressInfo> progress,
+            CancellationToken cancellationToken)
         {
             Directory.CreateDirectory(outputPath);
 
