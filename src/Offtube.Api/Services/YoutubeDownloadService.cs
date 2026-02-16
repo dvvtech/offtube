@@ -10,13 +10,29 @@ namespace Offtube.Api.Services
     {        
         private readonly string _proxyUrl;
         private readonly string _ytDlpPath;
+        private readonly IWebHostEnvironment _env;
 
         public YoutubeDownloadService(
             IOptions<AppConfig> options,
             IWebHostEnvironment env)
         {
             _proxyUrl = options.Value.ProxyUrl;
-            _ytDlpPath = "C:\\DVV\\Github\\Offtube\\src\\Offtube.Api\\bin\\Debug\\net9.0\\yt-dlp.exe";//Path.Combine(env.ContentRootPath, "yt-dlp.exe");
+
+            if (env.IsDevelopment())
+            {
+                _ytDlpPath = Path.Combine(Directory.GetCurrentDirectory(), "Tools", "yt-dlp.exe");                
+            }
+            else
+            {
+                _ytDlpPath = Path.Combine(Directory.GetCurrentDirectory(), "Tools", "yt-dlp");
+            }
+
+            if (!File.Exists(_ytDlpPath))
+            {
+                throw new ArgumentException("yt-dlp not found");
+            }
+
+            _env = env;
         }
 
         public async Task DownloadVideoAsync(
