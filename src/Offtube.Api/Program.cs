@@ -27,6 +27,6 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-app.MapHub<DownloadHub>("/downloadHub"); // SignalR endpoint
+app.MapHub<DownloadHub>("/offtube/downloadHub"); // SignalR endpoint
 
 app.Run();

@@ -12,10 +12,11 @@
                 options.AddPolicy(AllowSpecificOriginPolicy,
                     policy =>
                     {
-                        policy.WithOrigins("https://dvvtech.github.io")//"https://dvvtech.github.io/psycho-color-analysis"
+                        policy.WithOrigins("https://dvvtech.github.io")
                               .AllowCredentials() // Разрешить куки + signal r
                               .AllowAnyHeader()
-                              .AllowAnyMethod();
+                              .AllowAnyMethod()
+                              .SetIsOriginAllowedToAllowWildcardSubdomains();
                     });
 
                 options.AddPolicy(AllowAllPolicy, policy =>
@@ -23,7 +24,8 @@
                     policy.AllowAnyOrigin()  // Разрешить любой источник
                           .AllowCredentials() // Разрешить куки + signal r
                           .AllowAnyMethod()  // Разрешить любые HTTP-методы (GET, POST, PUT и т. д.)
-                          .AllowAnyHeader(); // Разрешить любые заголовки
+                          .AllowAnyHeader() // Разрешить любые заголовки
+                          .SetIsOriginAllowedToAllowWildcardSubdomains();
                 });
             });
         }
