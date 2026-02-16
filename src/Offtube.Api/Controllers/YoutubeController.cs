@@ -106,10 +106,11 @@ namespace Offtube.Api.Controllers
         [HttpGet("test")]
         public async Task<string> Test()
         {
-            var path = Path.Combine(Directory.GetCurrentDirectory(), "Tools");
-            var res = Directory.Exists(path);
+            var path = Path.Combine(Directory.GetCurrentDirectory(), "Tools", "yt-dlp");
+            //var res = Directory.Exists(path);
+            var hasFile = System.IO.File.Exists(path);
             _logger.LogInformation("call test");            
-            return path + " " + res;
+            return path + " 777 " + hasFile;
         }
     }
 }
