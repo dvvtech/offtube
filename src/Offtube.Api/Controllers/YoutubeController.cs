@@ -106,8 +106,9 @@ namespace Offtube.Api.Controllers
         [HttpGet("test")]
         public async Task<string> Test()
         {
+            var path = Directory.GetCurrentDirectory();
             _logger.LogInformation("call test");            
-            return "123";
+            return path;
         }
     }
 }
