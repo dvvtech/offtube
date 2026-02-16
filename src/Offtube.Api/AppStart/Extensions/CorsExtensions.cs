@@ -13,7 +13,7 @@
                     policy =>
                     {
                         policy.WithOrigins("https://dvvtech.github.io")
-                              .AllowCredentials() // Разрешить куки + signal r
+                              //.AllowCredentials() // Разрешить куки + signal r
                               .AllowAnyHeader()
                               .AllowAnyMethod();
                               //.SetIsOriginAllowed(origin => true);
@@ -24,7 +24,7 @@
                 options.AddPolicy(AllowAllPolicy, policy =>
                 {
                     policy.AllowAnyOrigin()  // Разрешить любой источник
-                          .AllowCredentials() // Разрешить куки + signal r
+                          //.AllowCredentials() // Разрешить куки + signal r
                           .AllowAnyMethod()  // Разрешить любые HTTP-методы (GET, POST, PUT и т. д.)
                           .AllowAnyHeader(); // Разрешить любые заголовки
                           //.SetIsOriginAllowed(origin => true);
