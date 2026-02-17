@@ -27,6 +27,7 @@ namespace Offtube.Api.Controllers
         [HttpPost("download")]
         public async Task<IActionResult> Download([FromBody] DownloadRequest request)
         {
+            _logger.LogInformation("start download");
             //var args = "yt-dlp https://www.youtube.com/watch?v=m1Dk0qMSDEg";
             //request.Url = "https://www.youtube.com/watch?v=m1Dk0qMSDEg";
             request.Url = "https://www.youtube.com/watch?v=uVOzD-GX0kM";
@@ -37,7 +38,7 @@ namespace Offtube.Api.Controllers
 
             var progress = new Progress<ProgressInfo>(async info =>
             {
-                _logger.LogInformation("send progress");
+                _logger.LogInformation($"send progress, progress: {info.Percentage}%");
 
                 // Отправляем прогресс через SignalR
                 await _hubContext.Clients.Group(downloadId)
