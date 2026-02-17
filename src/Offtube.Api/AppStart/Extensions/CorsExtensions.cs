@@ -13,11 +13,11 @@
                     policy =>
                     {
                         policy.WithOrigins("https://dvvtech.github.io")
-                              //.AllowCredentials() // Разрешить куки + signal r
                               .AllowAnyHeader()
-                              .AllowAnyMethod();
+                              .AllowAnyMethod()
+                              .AllowCredentials(); // Разрешить куки + signal r
                               //.SetIsOriginAllowed(origin => true);
-                        //.SetIsOriginAllowedToAllowWildcardSubdomains();
+                              //.SetIsOriginAllowedToAllowWildcardSubdomains();
 
                     });
 
