@@ -32,16 +32,15 @@ namespace Offtube.Api.Controllers
             //request.Url = "https://www.youtube.com/watch?v=m1Dk0qMSDEg";
             request.Url = "https://www.youtube.com/watch?v=uVOzD-GX0kM";
             request.Quality = "best[height <= 480]";
-            
-            var downloadId = Guid.NewGuid().ToString();            
-            var tempPath = Path.Combine(Directory.GetCurrentDirectory(), "youtube_downloads", downloadId);
+                     
+            var tempPath = Path.Combine(Directory.GetCurrentDirectory(), "youtube_downloads", request.DownloadId);
 
             var progress = new Progress<ProgressInfo>(async info =>
             {
-                _logger.LogInformation($"send progress, progress: {info.Percentage}%");
+                //_logger.LogInformation($"send progress, progress: {info.Percentage}%");
 
                 // Отправляем прогресс через SignalR
-                await _hubContext.Clients.Group(downloadId)
+                await _hubContext.Clients.Group(request.DownloadId)
                     .SendAsync("ReceiveProgress", info);
             });
             _logger.LogInformation("download2");
@@ -70,7 +69,7 @@ namespace Offtube.Api.Controllers
                 memory.Position = 0;
 
                 // Отправляем информацию о завершении
-                await _hubContext.Clients.Group(downloadId)
+                await _hubContext.Clients.Group(request.DownloadId)
                     .SendAsync("DownloadComplete", new
                     {
                         FileName = Path.GetFileName(file),
@@ -91,7 +90,7 @@ namespace Offtube.Api.Controllers
                     ".webm" => "video/webm",
                     _ => "application/octet-stream"
                 };
-
+                _logger.LogInformation("the end");
                 return File(memory, contentType, Path.GetFileName(file));
             }
             catch (OperationCanceledException ex)
