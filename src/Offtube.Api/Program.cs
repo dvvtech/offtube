@@ -16,17 +16,13 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-else
-{
-    app.ApplyCors();
-}
 
 app.UseHttpsRedirection();
 
-//if (!app.Environment.IsDevelopment())
-//{
-//    app.ApplyCors();
-//}
+if (!app.Environment.IsDevelopment())
+{
+    app.ApplyCors();
+}
 
 app.UseAuthorization();
 
