@@ -33,7 +33,7 @@ namespace Offtube.Api.Controllers
 
             var progress = new Progress<ProgressInfo>(async info =>
             {
-                //_logger.LogInformation($"send progress, progress: {info.Percentage}%");
+                _logger.LogInformation($"send progress, progress: {info.Percentage}%");
 
                 // Отправляем прогресс через SignalR
                 await _hubContext.Clients.Group(request.DownloadId)
