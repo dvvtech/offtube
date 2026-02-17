@@ -33,6 +33,7 @@ namespace Offtube.Api.Controllers
 
             var progress = new Progress<ProgressInfo>(async info =>
             {
+                info.Percentage = info.Percentage / 10;
                 _logger.LogInformation($"send progress, progress: {info.Percentage}%");
 
                 // Отправляем прогресс через SignalR
