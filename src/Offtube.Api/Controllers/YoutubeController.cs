@@ -30,8 +30,8 @@ namespace Offtube.Api.Controllers
             _logger.LogInformation("start download");
             //var args = "yt-dlp https://www.youtube.com/watch?v=m1Dk0qMSDEg";
             //request.Url = "https://www.youtube.com/watch?v=m1Dk0qMSDEg";
-            request.Url = "https://www.youtube.com/watch?v=uVOzD-GX0kM";
-            request.Quality = "best[height <= 480]";
+            //request.Url = "https://www.youtube.com/watch?v=uVOzD-GX0kM";
+            //request.Quality = "best[height <= 480]";
                      
             var tempPath = Path.Combine(Directory.GetCurrentDirectory(), "youtube_downloads", request.DownloadId);
 
