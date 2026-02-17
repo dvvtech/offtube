@@ -28,11 +28,7 @@ namespace Offtube.Api.Controllers
         public async Task<IActionResult> Download([FromBody] DownloadRequest request)
         {
             _logger.LogInformation("start download");
-            //var args = "yt-dlp https://www.youtube.com/watch?v=m1Dk0qMSDEg";
-            //request.Url = "https://www.youtube.com/watch?v=m1Dk0qMSDEg";
-            //request.Url = "https://www.youtube.com/watch?v=uVOzD-GX0kM";
-            //request.Quality = "best[height <= 480]";
-                     
+            
             var tempPath = Path.Combine(Directory.GetCurrentDirectory(), "youtube_downloads", request.DownloadId);
 
             var progress = new Progress<ProgressInfo>(async info =>
@@ -61,19 +57,15 @@ namespace Offtube.Api.Controllers
                     return NotFound("Файл не найден");
 
                 // Читаем файл в поток
-                var memory = new MemoryStream();
-                using (var stream = new FileStream(file, FileMode.Open, FileAccess.Read))
-                {
-                    await stream.CopyToAsync(memory);
-                }
-                memory.Position = 0;
 
+                var stream = new FileStream(file, FileMode.Open, FileAccess.Read);
+                
                 // Отправляем информацию о завершении
                 await _hubContext.Clients.Group(request.DownloadId)
                     .SendAsync("DownloadComplete", new
                     {
                         FileName = Path.GetFileName(file),
-                        FileSize = memory.Length
+                        FileSize = 3
                     });
 
                 // Удаляем временные файлы после отправки
@@ -91,7 +83,7 @@ namespace Offtube.Api.Controllers
                     _ => "application/octet-stream"
                 };
                 _logger.LogInformation("the end");
-                return File(memory, contentType, Path.GetFileName(file));
+                return File(stream, contentType, Path.GetFileName(file));
             }
             catch (OperationCanceledException ex)
             {
