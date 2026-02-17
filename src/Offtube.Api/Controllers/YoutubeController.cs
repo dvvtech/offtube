@@ -31,7 +31,7 @@ namespace Offtube.Api.Controllers
             //request.Url = "https://www.youtube.com/watch?v=m1Dk0qMSDEg";
             request.Url = "https://www.youtube.com/watch?v=uVOzD-GX0kM";
             request.Quality = "best[height <= 480]";
-
+            _logger.LogInformation("download1");
             var downloadId = Guid.NewGuid().ToString();            
             var tempPath = Path.Combine(Directory.GetCurrentDirectory(), "youtube_downloads", downloadId);
 
@@ -41,7 +41,7 @@ namespace Offtube.Api.Controllers
                 await _hubContext.Clients.Group(downloadId)
                     .SendAsync("ReceiveProgress", info);
             });
-
+            _logger.LogInformation("download2");
             try
             {
                 await _downloadService.DownloadVideoAsync(
@@ -50,7 +50,7 @@ namespace Offtube.Api.Controllers
                     tempPath,
                     progress,
                     HttpContext.RequestAborted);
-
+                _logger.LogInformation("download3");
                 // Ищем скачанный файл
                 var files = Directory.GetFiles(tempPath);
                 var file = files.FirstOrDefault();
