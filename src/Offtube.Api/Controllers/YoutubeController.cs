@@ -72,7 +72,7 @@ namespace Offtube.Api.Controllers
                 {
                     FileName = fileInfo.Name,
                     FileSize = fileInfo.Length,
-                    DownloadUrl = $"/offtube/video/file/{request.DownloadId}"
+                    DownloadUrl = $"/video/file/{request.DownloadId}"
                 });
         }
 
