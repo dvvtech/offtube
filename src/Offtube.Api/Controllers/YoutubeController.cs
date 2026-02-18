@@ -33,6 +33,7 @@ namespace Offtube.Api.Controllers
 
             var progress = new Progress<ProgressInfo>(async info =>
             {
+                //эта строка справедлива только если разворачивать в контейнере линукс
                 info.Percentage = info.Percentage / 10;
                 _logger.LogInformation($"send progress, progress: {info.Percentage}%");
 
@@ -40,7 +41,7 @@ namespace Offtube.Api.Controllers
                 await _hubContext.Clients.Group(request.DownloadId)
                     .SendAsync("ReceiveProgress", info);
             });
-            _logger.LogInformation("download2");
+            
             try
             {
                 await _downloadService.DownloadVideoAsync(
