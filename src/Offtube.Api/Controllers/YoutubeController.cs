@@ -50,8 +50,11 @@ namespace Offtube.Api.Controllers
                 info.Percentage = info.Percentage / 10;
 
                 await _hubContext.Clients
-                    .Group(request.DownloadId)
+                    .Client(request.ConnectionId)
                     .SendAsync("ReceiveProgress", info);
+                //await _hubContext.Clients
+                //    .Group(request.DownloadId)
+                //    .SendAsync("ReceiveProgress", info);
             });
 
             await _downloadService.DownloadVideoAsync(
@@ -67,7 +70,8 @@ namespace Offtube.Api.Controllers
             var fileInfo = new FileInfo(file);
 
             await _hubContext.Clients
-                .Group(request.DownloadId)
+                .Client(request.ConnectionId)
+                //.Group(request.DownloadId)
                 .SendAsync("DownloadComplete", new
                 {
                     FileName = fileInfo.Name,

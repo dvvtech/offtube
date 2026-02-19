@@ -7,5 +7,7 @@
         public string Quality { get; set; } = "best[height <= 480]";
 
         public string DownloadId { get; set; }
+
+        public string ConnectionId { get; set; }
     }
 }
