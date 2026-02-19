@@ -24,8 +24,8 @@ namespace Offtube.Api.Controllers
             _logger = logger;
         }
 
-        [HttpPost("download2")]
-        public async Task<IActionResult> Download2([FromBody] DownloadRequest request)
+        [HttpPost("download")]
+        public async Task<IActionResult> Download([FromBody] DownloadRequest request)
         {
             var downloadId = request.DownloadId;
 
