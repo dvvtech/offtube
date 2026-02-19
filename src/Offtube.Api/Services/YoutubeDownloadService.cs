@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Options;
+﻿
+using Microsoft.Extensions.Options;
 using Offtube.Api.Configuration;
 using Offtube.Api.Models;
 using System.Diagnostics;
@@ -11,6 +12,8 @@ namespace Offtube.Api.Services
         private readonly string _proxyUrl;
         private readonly string _ytDlpPath;
         private readonly IWebHostEnvironment _env;
+
+        private static readonly SemaphoreSlim _downloadLimiter = new SemaphoreSlim(3); // ← максимум 3 загрузки
 
         public YoutubeDownloadService(
             IOptions<AppConfig> options,
@@ -42,45 +45,62 @@ namespace Offtube.Api.Services
             IProgress<ProgressInfo> progress,
             CancellationToken cancellationToken)
         {
-            Directory.CreateDirectory(outputPath);
+            await _downloadLimiter.WaitAsync(cancellationToken);
+            //if (!_downloadLimiter.Wait(0))
+            //{
+            //    //throw new Exception("Сервер перегружен. Попробуйте позже.");
+            //или
+    //        await _hubContext.Clients
+    //.Client(request.ConnectionId)
+    //.SendAsync("Error", "Сервер перегружен. Попробуйте позже.");
+            //}
 
-            var arguments = BuildArguments(url, outputPath, quality);
-
-            var process = new Process
+            try
             {
-                StartInfo = new ProcessStartInfo
+                Directory.CreateDirectory(outputPath);
+
+                var arguments = BuildArguments(url, outputPath, quality);
+
+                var process = new Process
                 {
-                    FileName = _ytDlpPath,
-                    Arguments = arguments,
-                    UseShellExecute = false,
-                    RedirectStandardOutput = true,
-                    RedirectStandardError = true,
-                    CreateNoWindow = true,
-                    StandardOutputEncoding = Encoding.UTF8,
-                    StandardErrorEncoding = Encoding.UTF8
-                }
-            };
+                    StartInfo = new ProcessStartInfo
+                    {
+                        FileName = _ytDlpPath,
+                        Arguments = arguments,
+                        UseShellExecute = false,
+                        RedirectStandardOutput = true,
+                        RedirectStandardError = true,
+                        CreateNoWindow = true,
+                        StandardOutputEncoding = Encoding.UTF8,
+                        StandardErrorEncoding = Encoding.UTF8
+                    }
+                };
 
-            process.ErrorDataReceived += (sender, e) =>
+                process.ErrorDataReceived += (sender, e) =>
+                {
+                    if (!string.IsNullOrEmpty(e.Data))
+                        ParseProgress(e.Data, progress);
+                };
+
+                process.OutputDataReceived += (sender, e) =>
+                {
+                    if (!string.IsNullOrEmpty(e.Data))
+                        ParseProgress(e.Data, progress);
+                };
+
+                process.Start();
+                process.BeginErrorReadLine();
+                process.BeginOutputReadLine();
+
+                await process.WaitForExitAsync(cancellationToken);
+
+                if (process.ExitCode != 0)
+                    throw new Exception("Ошибка при скачивании видео");
+            }
+            finally
             {
-                if (!string.IsNullOrEmpty(e.Data))
-                    ParseProgress(e.Data, progress);
-            };
-
-            process.OutputDataReceived += (sender, e) =>
-            {
-                if (!string.IsNullOrEmpty(e.Data))
-                    ParseProgress(e.Data, progress);
-            };
-
-            process.Start();
-            process.BeginErrorReadLine();
-            process.BeginOutputReadLine();
-
-            await process.WaitForExitAsync(cancellationToken);
-
-            if (process.ExitCode != 0)
-                throw new Exception("Ошибка при скачивании видео");
+                _downloadLimiter.Release();
+            }
         }
 
         private string BuildArguments(string url, string outputPath, string quality)
