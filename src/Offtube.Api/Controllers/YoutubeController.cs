@@ -78,6 +78,22 @@ namespace Offtube.Api.Controllers
                     FileSize = fileInfo.Length,
                     DownloadUrl = $"/video/file/{request.DownloadId}"
                 });
+
+
+            _ = Task.Run(async () =>
+            {
+                await Task.Delay(TimeSpan.FromMinutes(10));
+
+                var dir = Path.Combine(
+                    Directory.GetCurrentDirectory(),
+                    "youtube_downloads",
+                    request.DownloadId);
+
+                if (Directory.Exists(dir))
+                {
+                    Directory.Delete(dir, true);
+                }
+            });
         }
 
         [HttpGet("file/{downloadId}")]
