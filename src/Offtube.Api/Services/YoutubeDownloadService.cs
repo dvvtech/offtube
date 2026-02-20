@@ -11,8 +11,7 @@ namespace Offtube.Api.Services
     {        
         private readonly string _proxyUrl;
         private readonly string _ytDlpPath;
-        private readonly IWebHostEnvironment _env;
-
+        
         private static readonly SemaphoreSlim _downloadLimiter = new SemaphoreSlim(3); // ← максимум 3 загрузки
 
         public YoutubeDownloadService(
@@ -34,8 +33,6 @@ namespace Offtube.Api.Services
             {
                 throw new ArgumentException("yt-dlp not found");
             }
-
-            _env = env;
         }
 
         public async Task DownloadVideoAsync(
