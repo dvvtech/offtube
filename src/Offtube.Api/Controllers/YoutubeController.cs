@@ -116,7 +116,7 @@ namespace Offtube.Api.Controllers
                 _ => "application/octet-stream"
             };
 
-            return PhysicalFile(file, contentType, Path.GetFileName(file));
+            return PhysicalFile(file, contentType, Path.GetFileName(file), enableRangeProcessing: true);
         }        
 
         [HttpGet("test")]
