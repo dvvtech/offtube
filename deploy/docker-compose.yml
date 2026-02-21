@@ -6,8 +6,8 @@ services:
       dockerfile: src/Offtube.Api/Dockerfile
     environment:
       - ASPNETCORE_ENVIRONMENT=Prod
-      - AppConfig__ProxyUrl=${PROXY_URL}      
-      
+      - AppConfig__ProxyUrl=${PROXY_URL}
+      - GoogleRecaptcha__SecretKey=${SECRET_KEY}       
     restart: unless-stopped    
     networks:
       - public-network
