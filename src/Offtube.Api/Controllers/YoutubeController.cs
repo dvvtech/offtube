@@ -136,9 +136,9 @@ namespace Offtube.Api.Controllers
         [HttpGet("test")]
         public async Task<string> Test()
         {
-            var downloadId = Guid.NewGuid().ToString();
-            var tempPath = Path.Combine(Directory.GetCurrentDirectory(), "youtube_downloads", downloadId);
-            Directory.CreateDirectory(tempPath);
+            //var downloadId = Guid.NewGuid().ToString();
+            //var tempPath = Path.Combine(Directory.GetCurrentDirectory(), "youtube_downloads", downloadId);
+            //Directory.CreateDirectory(tempPath);
 
             //var path = Path.Combine(Directory.GetCurrentDirectory(), "Tools", "yt-dlp");
             //var res = Directory.Exists(path);
