@@ -1,8 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
+using Microsoft.Extensions.Options;
+using Offtube.Api.Configuration;
 using Offtube.Api.Hub;
 using Offtube.Api.Models;
 using Offtube.Api.Services;
+using System.Text.Json;
 
 namespace Offtube.Api.Controllers
 {
@@ -13,21 +16,32 @@ namespace Offtube.Api.Controllers
         private readonly IYoutubeDownloadService _downloadService;
         private readonly IHubContext<DownloadHub> _hubContext;
         private readonly ILogger<YoutubeController> _logger;
+        private readonly IHttpClientFactory _httpClientFactory;
+        private readonly IOptions<GoogleRecaptchaConfig> _recaptchaOptions;
 
         public YoutubeController(
             IYoutubeDownloadService downloadService,
             IHubContext<DownloadHub> hubContext,
+            IHttpClientFactory httpClientFactory,
+            IOptions<GoogleRecaptchaConfig> recaptchaOptions,
             ILogger<YoutubeController> logger)
         {
             _downloadService = downloadService;
             _hubContext = hubContext;
+            _httpClientFactory = httpClientFactory;
+            _recaptchaOptions = recaptchaOptions;
             _logger = logger;
         }
 
         [HttpPost("download")]
         public async Task<IActionResult> Download([FromBody] DownloadRequest request)
         {
-            var downloadId = request.DownloadId;
+            var recaptchaValid = await ValidateRecaptcha(request.RecaptchaToken, _recaptchaOptions.Value.SecretKey);
+            if (!recaptchaValid)
+            {
+                _logger.LogInformation("captcha not valid");
+                return BadRequest("reCAPTCHA validation failed.");
+            }
 
             _ = Task.Run(async () =>
             {
@@ -131,6 +145,20 @@ namespace Offtube.Api.Controllers
             //var hasFile = System.IO.File.Exists(path);
             _logger.LogInformation("call test");            
             return "123";
+        }
+
+        private async Task<bool> ValidateRecaptcha(string token, string secretKey)
+        {
+            if (string.IsNullOrWhiteSpace(token))
+                return false;
+
+            var httpClient = _httpClientFactory.CreateClient();
+
+            var response = await httpClient.GetStringAsync(
+                $"https://www.google.com/recaptcha/api/siteverify?secret={secretKey}&response={token}");
+
+            var recaptchaResponse = JsonSerializer.Deserialize<RecaptchaResponse>(response);
+            return recaptchaResponse?.Success == true && recaptchaResponse.Score >= 0.5;
         }
     }
 }

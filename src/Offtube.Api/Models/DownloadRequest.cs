@@ -9,5 +9,7 @@
         public string DownloadId { get; set; }
 
         public string ConnectionId { get; set; }
+
+        public string RecaptchaToken { get; set; }
     }
 }

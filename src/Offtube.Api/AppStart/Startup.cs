@@ -30,6 +30,9 @@ namespace Offtube.Api.AppStart
                 _builder.Services.ConfigureCors();
             }
 
+            // Регистрация HttpClientFactory
+            _builder.Services.AddHttpClient();
+
             InitConfigs();
 
             // Добавляем SignalR
@@ -43,12 +46,13 @@ namespace Offtube.Api.AppStart
         private void InitConfigs()
         {
             _builder.Services.Configure<AppConfig>(_builder.Configuration.GetSection(AppConfig.SectionName));
+            _builder.Services.Configure<GoogleRecaptchaConfig>(_builder.Configuration.GetSection(GoogleRecaptchaConfig.SectionName));
 
-            var configSection = _builder.Configuration.GetSection(AppConfig.SectionName);
-            var appConfig = configSection.Get<AppConfig>();
+            var configSection = _builder.Configuration.GetSection(GoogleRecaptchaConfig.SectionName);
+            var cap = configSection.Get<GoogleRecaptchaConfig>();
 
-            if(appConfig.ProxyUrl.Length > 0)
-                _logger.LogInformation($"appConfig.ProxyUrl > 0, len:{appConfig.ProxyUrl.Length}");
+            if(cap.SecretKey.Length > 0)
+                _logger.LogInformation($"cap.len > 0, len:{cap.SecretKey.Length}");
         }
     }
 }
