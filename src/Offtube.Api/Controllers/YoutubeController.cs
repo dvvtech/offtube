@@ -40,7 +40,7 @@ namespace Offtube.Api.Controllers
             if (!recaptchaValid)
             {
                 _logger.LogInformation("captcha not valid");
-                return BadRequest("reCAPTCHA validation failed.");
+                return BadRequest("reCAPTCHA validation failed");
             }
 
             _ = Task.Run(async () =>
@@ -92,7 +92,6 @@ namespace Offtube.Api.Controllers
                     FileSize = fileInfo.Length,
                     DownloadUrl = $"/video/file/{request.DownloadId}"
                 });
-
 
             _ = Task.Run(async () =>
             {

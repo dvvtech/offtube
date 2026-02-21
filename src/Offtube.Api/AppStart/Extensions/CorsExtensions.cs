@@ -12,13 +12,12 @@
                 options.AddPolicy(AllowSpecificOriginPolicy,
                     policy =>
                     {
-                        policy.WithOrigins("https://dvvtech.github.io")
+                        policy.WithOrigins("offtube.tech")//"https://dvvtech.github.io"
                               .AllowAnyHeader()
                               .AllowAnyMethod()
                               .AllowCredentials(); // Разрешить куки + signal r
                               //.SetIsOriginAllowed(origin => true);
                               //.SetIsOriginAllowedToAllowWildcardSubdomains();
-
                     });
 
                 options.AddPolicy(AllowAllPolicy, policy =>
