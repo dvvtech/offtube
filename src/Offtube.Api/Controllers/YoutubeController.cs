@@ -48,7 +48,9 @@ namespace Offtube.Api.Controllers
                 await ProcessDownloadAsync(request);
             });
 
+            _logger.LogInformation("Start trackVisitAsync");
             await TrackVisitAsync();
+            _logger.LogInformation("End trackVisitAsync");
 
             return Accepted(); // ← сразу ответ 202
         }
@@ -171,7 +173,7 @@ namespace Offtube.Api.Controllers
             // Создаем запрос к analytics
             var request = new HttpRequestMessage(
                 HttpMethod.Get,
-                "https://api.cloud-platform.pro/data-analyst/v1/analytics/track-offtube-tech");
+                "http://analytics-api-container:8080/data-analyst/v1/analytics/track-offtube-tech");
             
             request.Headers.Add("X-Forwarded-For", clientIp);
             request.Headers.Add("X-Real-IP", clientIp);
