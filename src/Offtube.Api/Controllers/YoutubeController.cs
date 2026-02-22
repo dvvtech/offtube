@@ -47,10 +47,8 @@ namespace Offtube.Api.Controllers
             {
                 await ProcessDownloadAsync(request);
             });
-
-            _logger.LogInformation("Start trackVisitAsync");
-            await TrackVisitAsync();
-            _logger.LogInformation("End trackVisitAsync");
+            
+            _ = TrackVisitAsync();            
 
             return Accepted(); // ← сразу ответ 202
         }
@@ -189,11 +187,7 @@ namespace Offtube.Api.Controllers
             if (!response.IsSuccessStatusCode)
             {
                 _logger.LogWarning($"Analytics tracking failed: {response.StatusCode}");
-            }
-            else
-            {
-                _logger.LogWarning($"Analytics tracking success: {response.StatusCode}");
-            }
+            }            
         }
 
         private string GetRealClientIp(HttpContext context)
