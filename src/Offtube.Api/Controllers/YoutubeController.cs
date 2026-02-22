@@ -188,6 +188,10 @@ namespace Offtube.Api.Controllers
             {
                 _logger.LogWarning($"Analytics tracking failed: {response.StatusCode}");
             }
+            else
+            {
+                _logger.LogWarning($"Analytics tracking success: {response.StatusCode}");
+            }
         }
 
         private string GetRealClientIp(HttpContext context)
