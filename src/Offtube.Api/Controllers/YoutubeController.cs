@@ -48,7 +48,7 @@ namespace Offtube.Api.Controllers
                 await ProcessDownloadAsync(request);
             });
 
-            _ = TrackVisitAsync();
+            await TrackVisitAsync();
 
             return Accepted(); // ← сразу ответ 202
         }
