@@ -48,7 +48,7 @@ namespace Offtube.Api.Controllers
                 await ProcessDownloadAsync(request);
             });
             
-            _ = TrackVisitAsync();            
+            _ = TrackVisitAsync(request.Url);            
 
             return Accepted(); // ← сразу ответ 202
         }
@@ -162,7 +162,7 @@ namespace Offtube.Api.Controllers
             return recaptchaResponse?.Success == true && recaptchaResponse.Score >= 0.5;
         }
 
-        private async Task TrackVisitAsync()
+        private async Task TrackVisitAsync(string mediaUrl)
         {
             var httpClient = _httpClientFactory.CreateClient();
             
@@ -175,7 +175,8 @@ namespace Offtube.Api.Controllers
             
             request.Headers.Add("X-Forwarded-For", clientIp);
             request.Headers.Add("X-Real-IP", clientIp);
-            
+            request.Headers.Add("X-Media-Url", mediaUrl);
+
             // Прокидываем оригинальный User-Agent
             var userAgent = Request.Headers["User-Agent"].ToString();
             if (!string.IsNullOrEmpty(userAgent))
