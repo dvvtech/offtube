@@ -35,6 +35,29 @@ namespace Offtube.Api.Services
             }
         }
 
+        public async Task GetQualities(string mediaUrl)
+        {
+            var process = new Process
+            {
+                StartInfo = new ProcessStartInfo
+                {
+                    FileName = _ytDlpPath,
+                    Arguments = @"-F " + mediaUrl,
+                    UseShellExecute = false,
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = true,
+                    CreateNoWindow = true,
+                    StandardOutputEncoding = Encoding.UTF8,
+                    StandardErrorEncoding = Encoding.UTF8
+                }
+            };
+
+            process.Start();
+
+            string output = process.StandardOutput.ReadToEnd();
+            // Парсим output и извлекаем доступные качества
+        }
+
         public async Task DownloadVideoAsync(
             string url,
             string quality,

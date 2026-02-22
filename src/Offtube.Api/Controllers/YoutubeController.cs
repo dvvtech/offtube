@@ -35,7 +35,9 @@ namespace Offtube.Api.Controllers
 
         [HttpPost("download")]
         public async Task<IActionResult> Download([FromBody] DownloadRequest request)
-        {            
+        {
+            _logger.LogInformation($"quality: {request.Quality}");
+
             var recaptchaValid = await ValidateRecaptcha(request.RecaptchaToken, _recaptchaOptions.Value.SecretKey);
             if (!recaptchaValid)
             {
