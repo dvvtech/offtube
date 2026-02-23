@@ -14,7 +14,7 @@ namespace Offtube.Unit.Tests
         {
             // Arrange
             var mockEnv = new Mock<IWebHostEnvironment>();
-            mockEnv.Setup(e => e.EnvironmentName).Returns(Environments.Development);
+            mockEnv.Setup(e => e.EnvironmentName).Returns(Environments.Production);
 
             var options = Options.Create(new AppConfig
             {

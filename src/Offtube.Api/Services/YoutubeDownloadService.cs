@@ -35,8 +35,10 @@ namespace Offtube.Api.Services
             }
         }
 
-        public async Task GetQualities(string mediaUrl)
+        public async Task<List<VideoQuality>> GetQualities(string mediaUrl)
         {
+            var qualities = new List<VideoQuality>();
+
             var process = new Process
             {
                 StartInfo = new ProcessStartInfo
@@ -55,7 +57,46 @@ namespace Offtube.Api.Services
             process.Start();
 
             string output = process.StandardOutput.ReadToEnd();
-            // Парсим output и извлекаем доступные качества
+            string error = await process.StandardError.ReadToEndAsync();
+            await process.WaitForExitAsync();
+
+            if (process.ExitCode != 0)
+            {
+                throw new Exception($"Ошибка при получении качеств: {error}");
+            }
+
+            // Парсим вывод
+            var lines = output.Split('\n');
+            foreach (var line in lines)
+            {
+                var quality = ParseQualityLine(line);
+                if (quality != null)
+                {
+                    qualities.Add(quality);
+                }
+            }
+
+            return qualities;
+        }
+
+        private VideoQuality ParseQualityLine(string line)
+        {
+            // Пример строки: "248 webm 1920x1080 1080 1 | ~31.27MiB 1490k https"
+            var match = System.Text.RegularExpressions.Regex.Match(line,
+                @"^(\d+)\s+(\w+)\s+(\d+x\d+)?\s*(\d+p)?");
+
+            if (match.Success)
+            {
+                return new VideoQuality
+                {
+                    Id = match.Groups[1].Value,
+                    Extension = match.Groups[2].Value,
+                    Resolution = match.Groups[3].Value,
+                    Quality = match.Groups[4].Value
+                };
+            }
+
+            return null;
         }
 
         public async Task DownloadVideoAsync(
