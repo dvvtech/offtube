@@ -10,9 +10,10 @@ namespace YtDlpDownloader
         {
             try
             {
-                string url = "https://www.youtube.com/watch?v=9yXY9uMB_yE";
+                string url = "";
                 string downloadPath = "vid";
-                string quality = "best[height <= 480]";
+                //string quality = "best[height <= 480]";
+                string quality = "bestaudio";
 
                 await DownloadVideoAsync(url, downloadPath, quality);
 
@@ -79,8 +80,12 @@ namespace YtDlpDownloader
 
         static string BuildArguments(string url, string outputPath, string quality)
         {
+            string ffmpegPath = @"C:\DVV\Utils\ffmpeg-master-latest-linux64-gpl\bin";
+
             // Базовые параметры
             var args = $"-o \"%(title)s.%(ext)s\" -f \"{quality}\" ";
+
+            args += $"--ffmpeg-location \"{ffmpegPath}\" ";
 
             // Дополнительные параметры
             args += "--no-playlist "; // Не скачивать плейлист, только одно видео
