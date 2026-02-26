@@ -199,10 +199,10 @@ namespace Offtube.Api.Services
                 }
 
                 // Скорость
-                var speedMatch = System.Text.RegularExpressions.Regex.Match(line, @"at\s+([\d\.]+\w?/s)");
+                var speedMatch = System.Text.RegularExpressions.Regex.Match(line, @"at\s+([\d\.]+\w+/s)");
                 if (speedMatch.Success)
                 {
-                    progressInfo.Speed =  double.Parse(speedMatch.Groups[1].Value);
+                    progressInfo.Speed =  speedMatch.Groups[1].Value;
                 }
 
                 // ETA
