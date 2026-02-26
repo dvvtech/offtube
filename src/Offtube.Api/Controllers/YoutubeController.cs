@@ -69,10 +69,7 @@ namespace Offtube.Api.Controllers
 
                 await _hubContext.Clients
                     .Client(request.ConnectionId)
-                    .SendAsync("ReceiveProgress", info);
-                //await _hubContext.Clients
-                //    .Group(request.DownloadId)
-                //    .SendAsync("ReceiveProgress", info);
+                    .SendAsync("ReceiveProgress", info);                
             });
 
             await _downloadService.DownloadVideoAsync(
@@ -88,8 +85,7 @@ namespace Offtube.Api.Controllers
             var fileInfo = new FileInfo(file);
 
             await _hubContext.Clients
-                .Client(request.ConnectionId)
-                //.Group(request.DownloadId)
+                .Client(request.ConnectionId)                
                 .SendAsync("DownloadComplete", new
                 {
                     FileName = fileInfo.Name,
