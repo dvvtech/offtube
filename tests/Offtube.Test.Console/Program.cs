@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Diagnostics;
 
 namespace YtDlpDownloader
 {
@@ -10,10 +11,14 @@ namespace YtDlpDownloader
         {
             try
             {
-                string url = "";
+                string url = "https://www.youtube.com/watch?v=xPIjetL93Ac";
                 string downloadPath = "vid";
-                //string quality = "best[height <= 480]";
-                string quality = "bestaudio";
+                string quality = "best[height<=480]";
+                //string quality = "best[height<=720][fps<=60]";
+                //string quality = "398+140";
+                //string quality = "bestaudio";
+
+                //await ListFormatsAsync(url);
 
                 await DownloadVideoAsync(url, downloadPath, quality);
 
@@ -30,7 +35,7 @@ namespace YtDlpDownloader
 
         static async Task DownloadVideoAsync(string url, string outputPath, string quality)
         {
-            string ytDlpPath = "yt-dlp.exe";
+            string ytDlpPath = "C:\\DVV\\Github\\Offtube\\src\\Offtube.Api\\Tools\\yt-dlp.exe";
 
             // Создаем аргументы для yt-dlp
             string arguments = BuildArguments(url, outputPath, quality);
@@ -60,7 +65,10 @@ namespace YtDlpDownloader
                 {
                     string line = process.StandardOutput.ReadLine();
                     if (!string.IsNullOrEmpty(line))
+                    {
                         Console.WriteLine(line);
+                        ParseProgress(line);
+                    }
                 }
             });
 
@@ -80,12 +88,12 @@ namespace YtDlpDownloader
 
         static string BuildArguments(string url, string outputPath, string quality)
         {
-            string ffmpegPath = @"C:\DVV\Utils\ffmpeg-master-latest-linux64-gpl\bin";
+            //string ffmpegPath = @"C:\DVV\Utils\ffmpeg-master-latest-linux64-gpl\bin";
 
             // Базовые параметры
             var args = $"-o \"%(title)s.%(ext)s\" -f \"{quality}\" ";
 
-            args += $"--ffmpeg-location \"{ffmpegPath}\" ";
+            //args += $"--ffmpeg-location \"{ffmpegPath}\" ";
 
             // Дополнительные параметры
             args += "--no-playlist "; // Не скачивать плейлист, только одно видео
@@ -103,6 +111,77 @@ namespace YtDlpDownloader
             args += $"\"{url}\"";
 
             return args;
+        }
+
+        static async Task ListFormatsAsync(string url)
+        {
+            string ytDlpPath = "C:\\DVV\\Github\\Offtube\\src\\Offtube.Api\\Tools\\yt-dlp.exe";
+            string arguments = $"--proxy \"{PROXY_URL}\" -F \"{url}\"";
+
+            Console.WriteLine("Доступные форматы:");
+            Console.WriteLine("==================");
+
+            using var process = new Process();
+            process.StartInfo = new ProcessStartInfo
+            {
+                FileName = ytDlpPath,
+                Arguments = arguments,
+                UseShellExecute = false,
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
+                CreateNoWindow = false
+            };            
+
+            process.Start();
+
+            string output = await process.StandardOutput.ReadToEndAsync();
+            string error = await process.StandardError.ReadToEndAsync();
+            await process.WaitForExitAsync();
+
+            Console.WriteLine(output);
+            if (!string.IsNullOrEmpty(error))
+                Console.WriteLine($"Ошибка: {error}");
+        }
+
+        private static void ParseProgress(string line)
+        {
+            
+
+            // Пример парсинга: [download]   0.0% of ~10.23MiB at 0B/s ETA Unknown
+            if (line.Contains("[download]") && line.Contains("%"))
+            {
+                var percentMatch = System.Text.RegularExpressions.Regex.Match(line, @"(\d+\.?\d*)%");
+                if (percentMatch.Success)
+                {
+                    var Percentage = (int)double.Parse(percentMatch.Groups[1].Value.Replace(".", ","));
+                    //progressInfo.Status = "Загрузка...";
+                }
+
+                // Скорость
+                var speedMatch = System.Text.RegularExpressions.Regex.Match(line, @"at\s+([\d\.]+\w+/s)");
+                if (speedMatch.Success)
+                {
+                    var Speed = speedMatch.Groups[1].Value;
+                }
+
+                // ETA
+                //var etaMatch = System.Text.RegularExpressions.Regex.Match(line, @"ETA\s+(\d+:\d+)");
+                //if (etaMatch.Success)
+                //    progressInfo.Eta = etaMatch.Groups[1].Value;
+            }
+            // Название файла
+            //else if (line.Contains("[download] Destination:"))
+            //{
+            //    progressInfo.FileName = line.Replace("[download] Destination:", "").Trim();
+            //    progressInfo.Status = "Начало загрузки...";
+            //}
+            //else if (line.Contains("[ExtractAudio] Destination:"))
+            //{
+            //    progressInfo.FileName = line.Replace("[ExtractAudio] Destination:", "").Trim();
+            //    progressInfo.Status = "Конвертация...";
+            //}
+
+            //progress.Report(progressInfo);
         }
     }
 }
