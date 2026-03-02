@@ -41,6 +41,8 @@ namespace Offtube.Api.AppStart
             // Регистрируем сервис
             _builder.Services.AddScoped<IYoutubeDownloadService, YoutubeDownloadService>();
             _builder.Services.AddHttpContextAccessor();
+
+            _builder.Services.AddControllers();
         }
 
         private void InitConfigs()

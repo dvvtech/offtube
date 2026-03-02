@@ -7,8 +7,6 @@ var builder = WebApplication.CreateBuilder(args);
 var startup = new Startup(builder);
 startup.Initialize();
 
-builder.Services.AddControllers();
-
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
