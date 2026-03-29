@@ -4,6 +4,6 @@
     {
         public const string SectionName = "GoogleRecaptcha";
 
-        public string SecretKey { get; init; }
+        public string SecretKeyForOfftube { get; init; }
     }
 }

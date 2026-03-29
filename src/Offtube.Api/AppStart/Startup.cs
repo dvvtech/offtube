@@ -47,14 +47,15 @@ namespace Offtube.Api.AppStart
 
         private void InitConfigs()
         {
-            _builder.Services.Configure<AppConfig>(_builder.Configuration.GetSection(AppConfig.SectionName));
+            _builder.Services.Configure<ProxyConfig>(_builder.Configuration.GetSection(ProxyConfig.SectionName));
+            //_builder.Services.Configure<AppConfig>(_builder.Configuration.GetSection(AppConfig.SectionName));
             _builder.Services.Configure<GoogleRecaptchaConfig>(_builder.Configuration.GetSection(GoogleRecaptchaConfig.SectionName));
 
-            var configSection = _builder.Configuration.GetSection(GoogleRecaptchaConfig.SectionName);
-            var cap = configSection.Get<GoogleRecaptchaConfig>();
+            //var configSection = _builder.Configuration.GetSection(GoogleRecaptchaConfig.SectionName);
+            //var cap = configSection.Get<GoogleRecaptchaConfig>();
 
-            if(cap.SecretKey.Length > 0)
-                _logger.LogInformation($"cap.len > 0, len:{cap.SecretKey.Length}");
+            //if(cap.SecretKeyForOfftube.Length > 0)
+            //    _logger.LogInformation($"cap.len > 0, len:{cap.SecretKeyForOfftube.Length}");
         }
     }
 }

@@ -14,11 +14,12 @@ namespace Offtube.Api.Services
         
         private static readonly SemaphoreSlim _downloadLimiter = new SemaphoreSlim(3); // ← максимум 3 загрузки
 
-        public YoutubeDownloadService(
-            IOptions<AppConfig> options,
+        public YoutubeDownloadService(            
+            IOptions<ProxyConfig> options,
             IWebHostEnvironment env)
         {
-            _proxyUrl = options.Value.ProxyUrl;
+            var config = options.Value;            
+            _proxyUrl = $"http://{config.Login}:{config.Password}@{config.Ip}:{config.Port}";
 
             if (env.IsDevelopment())
             {

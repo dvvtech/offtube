@@ -1,25 +1,39 @@
 services:
   offtube_api:
-    container_name: offtube-api-container
-    build:
-      context: ..
-      dockerfile: src/Offtube.Api/Dockerfile
+    image: ghcr.io/dvvtech/offtube:latest      
     environment:
-      - ASPNETCORE_ENVIRONMENT=Prod
-      - AppConfig__ProxyUrl=${PROXY_URL}
-      - GoogleRecaptcha__SecretKey=${SECRET_KEY}       
-    restart: unless-stopped    
+      - ASPNETCORE_ENVIRONMENT=Prod                
     networks:
-      - public-network
-    labels:      
-      - "traefik.enable=true"      
-      - "traefik.http.routers.offtube-api.rule=Host(`api.cloud-platform.pro`) && PathPrefix(`/offtube`)"
-      - "traefik.http.routers.offtube-api.entrypoints=websecure"      
-      - "traefik.http.routers.offtube-api.tls.certresolver=letsencrypt"     
-      - "traefik.http.services.offtube-api.loadbalancer.server.port=8080"
-      - "traefik.http.middlewares.offtube-stripprefix.stripprefix.prefixes=/offtube"
-      - "traefik.http.routers.offtube-api.middlewares=offtube-stripprefix"
+      - public-network5
+    secrets:
+      - GoogleRecaptcha__SecretKeyForOfftube
+      - ProxySettings__Ip      
+      - ProxySettings__Login
+      - ProxySettings__Password
+    deploy:
+      mode: replicated
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+      labels:    
+        - "traefik.enable=true"      
+        - "traefik.http.routers.offtube-api.rule=Host(`api.cloud-platform.pro`) && PathPrefix(`/offtube`)"
+        - "traefik.http.routers.offtube-api.entrypoints=websecure"      
+        - "traefik.http.routers.offtube-api.tls.certresolver=letsencrypt"     
+        - "traefik.http.services.offtube-api.loadbalancer.server.port=8080"
+        - "traefik.http.middlewares.offtube-stripprefix.stripprefix.prefixes=/offtube"
+        - "traefik.http.routers.offtube-api.middlewares=offtube-stripprefix"
 
 networks:
-  public-network:
+  public-network5:
+    external: true
+
+secrets:
+  GoogleRecaptcha__SecretKeyForOfftube:
+    external: true  
+  ProxySettings__Ip:
+    external: true
+  ProxySettings__Login:
+    external: true
+  ProxySettings__Password:
     external: true

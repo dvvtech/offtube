@@ -38,7 +38,7 @@ namespace Offtube.Api.Controllers
         {
             _logger.LogInformation($"quality: {request.Quality}");
 
-            var recaptchaValid = await ValidateRecaptcha(request.RecaptchaToken, _recaptchaOptions.Value.SecretKey);
+            var recaptchaValid = await ValidateRecaptcha(request.RecaptchaToken, _recaptchaOptions.Value.SecretKeyForOfftube);
             if (!recaptchaValid)
             {
                 _logger.LogInformation("captcha not valid");

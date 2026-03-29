@@ -16,9 +16,9 @@ namespace Offtube.Unit.Tests
             var mockEnv = new Mock<IWebHostEnvironment>();
             mockEnv.Setup(e => e.EnvironmentName).Returns(Environments.Production);
 
-            var options = Options.Create(new AppConfig
+            var options = Options.Create(new ProxyConfig
             {
-                ProxyUrl = "123"
+                Enabled = true,
             });
 
             var service = new YoutubeDownloadService(options, mockEnv.Object);
