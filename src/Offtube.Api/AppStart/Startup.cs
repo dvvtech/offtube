@@ -47,6 +47,11 @@ namespace Offtube.Api.AppStart
 
         private void InitConfigs()
         {
+            if (!_builder.Environment.IsDevelopment())
+            {
+                _builder.Configuration.AddKeyPerFile("/run/secrets", optional: true);
+            }
+
             _builder.Services.Configure<ProxyConfig>(_builder.Configuration.GetSection(ProxyConfig.SectionName));
             //_builder.Services.Configure<AppConfig>(_builder.Configuration.GetSection(AppConfig.SectionName));
             _builder.Services.Configure<GoogleRecaptchaConfig>(_builder.Configuration.GetSection(GoogleRecaptchaConfig.SectionName));
@@ -54,10 +59,10 @@ namespace Offtube.Api.AppStart
             var configSection = _builder.Configuration.GetSection(GoogleRecaptchaConfig.SectionName);
             var cap = configSection.Get<GoogleRecaptchaConfig>();
 
-            if (cap.SecretKeyForOfftube.Length > 0)
-            {
-                _logger.LogInformation("captcha: " + cap.SecretKeyForOfftube);
-            }
+            //if (cap.SecretKeyForOfftube.Length > 0)
+            //{
+            //    _logger.LogInformation("captcha: " + cap.SecretKeyForOfftube);
+            //}
                 //_logger.LogInformation($"cap.len > 0, len:{cap.SecretKeyForOfftube.Length}");
         }
     }
