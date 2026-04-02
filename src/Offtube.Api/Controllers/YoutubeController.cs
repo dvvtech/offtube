@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Options;
+using Offtube.Api.AppStart;
 using Offtube.Api.Configuration;
 using Offtube.Api.Hub;
 using Offtube.Api.Models;
@@ -163,8 +164,8 @@ namespace Offtube.Api.Controllers
         private async Task TrackVisitAsync(string mediaUrl)
         {
             var httpClient = _httpClientFactory.CreateClient();
-            
-            var clientIp = GetRealClientIp(HttpContext);
+
+            var clientIp = HttpContext.GetRealClientIp();
 
             // Создаем запрос к analytics
             var request = new HttpRequestMessage(
@@ -187,25 +188,6 @@ namespace Offtube.Api.Controllers
             {
                 _logger.LogWarning($"Analytics tracking failed: {response.StatusCode}");
             }            
-        }
-
-        private string GetRealClientIp(HttpContext context)
-        {            
-            var forwardedFor = context.Request.Headers["X-Forwarded-For"].FirstOrDefault();
-            if (!string.IsNullOrEmpty(forwardedFor))
-            {
-                // Берем первый IP из цепочки (реальный клиентский)
-                return forwardedFor.Split(',').First().Trim();
-            }
-
-            var realIp = context.Request.Headers["X-Real-IP"].FirstOrDefault();
-            if (!string.IsNullOrEmpty(realIp))
-            {
-                return realIp;
-            }
-
-            // Если нет заголовков, используем RemoteIpAddress
-            return context.Connection.RemoteIpAddress?.ToString() ?? "unknown";
         }
     }
 }
