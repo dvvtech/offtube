@@ -1,6 +1,6 @@
 ﻿using Offtube.Api.Models;
 
-namespace Offtube.Api.Services
+namespace Offtube.Api.Services.Abstract
 {
     public interface IYoutubeDownloadService
     {

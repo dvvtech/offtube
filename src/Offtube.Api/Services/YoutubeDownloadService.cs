@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Options;
 using Offtube.Api.Configuration;
 using Offtube.Api.Models;
+using Offtube.Api.Services.Abstract;
 using System.Diagnostics;
 using System.Text;
 

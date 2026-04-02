@@ -5,7 +5,7 @@ using Offtube.Api.AppStart;
 using Offtube.Api.Configuration;
 using Offtube.Api.Hub;
 using Offtube.Api.Models;
-using Offtube.Api.Services;
+using Offtube.Api.Services.Abstract;
 using System.Text.Json;
 
 namespace Offtube.Api.Controllers
@@ -14,6 +14,7 @@ namespace Offtube.Api.Controllers
     [ApiController]
     public class YoutubeController : ControllerBase
     {
+        private readonly IAnalyticsTrackingService _analyticsTrackingService;
         private readonly IYoutubeDownloadService _downloadService;
         private readonly IHubContext<DownloadHub> _hubContext;
         private readonly ILogger<YoutubeController> _logger;
@@ -21,12 +22,14 @@ namespace Offtube.Api.Controllers
         private readonly IOptions<GoogleRecaptchaConfig> _recaptchaOptions;
 
         public YoutubeController(
+            IAnalyticsTrackingService analyticsTrackingService,
             IYoutubeDownloadService downloadService,
             IHubContext<DownloadHub> hubContext,
             IHttpClientFactory httpClientFactory,
             IOptions<GoogleRecaptchaConfig> recaptchaOptions,
             ILogger<YoutubeController> logger)
         {
+            _analyticsTrackingService = analyticsTrackingService;
             _downloadService = downloadService;
             _hubContext = hubContext;
             _httpClientFactory = httpClientFactory;
@@ -39,6 +42,11 @@ namespace Offtube.Api.Controllers
         {
             _logger.LogInformation($"quality: {request.Quality}");
 
+            var clientIp = HttpContext.GetRealClientIp();
+            var userAgent = Request.Headers["User-Agent"].ToString();
+
+            _ = _analyticsTrackingService.TrackVisitAsync(request.Url, clientIp, userAgent);            
+
             var recaptchaValid = await ValidateRecaptcha(request.RecaptchaToken, _recaptchaOptions.Value.SecretKeyForOfftube);
             if (!recaptchaValid)
             {
@@ -49,9 +57,7 @@ namespace Offtube.Api.Controllers
             _ = Task.Run(async () =>
             {
                 await ProcessDownloadAsync(request);
-            });
-            
-            _ = TrackVisitAsync(request.Url);            
+            });                        
 
             return Accepted(); // ← сразу ответ 202
         }
@@ -159,35 +165,6 @@ namespace Offtube.Api.Controllers
 
             var recaptchaResponse = JsonSerializer.Deserialize<RecaptchaResponse>(response);
             return recaptchaResponse?.Success == true && recaptchaResponse.Score >= 0.5;
-        }
-
-        private async Task TrackVisitAsync(string mediaUrl)
-        {
-            var httpClient = _httpClientFactory.CreateClient();
-
-            var clientIp = HttpContext.GetRealClientIp();
-
-            // Создаем запрос к analytics
-            var request = new HttpRequestMessage(
-                HttpMethod.Get,
-                "http://analytics_api:8080/v1/analytics/track-offtube-tech");
-            
-            request.Headers.Add("X-Forwarded-For", clientIp);
-            request.Headers.Add("X-Real-IP", clientIp);
-            request.Headers.Add("X-Media-Url", mediaUrl);
-
-            // Прокидываем оригинальный User-Agent
-            var userAgent = Request.Headers["User-Agent"].ToString();
-            if (!string.IsNullOrEmpty(userAgent))
-            {
-                request.Headers.Add("User-Agent", userAgent);
-            }
-            
-            var response = await httpClient.SendAsync(request);
-            if (!response.IsSuccessStatusCode)
-            {
-                _logger.LogWarning($"Analytics tracking failed: {response.StatusCode}");
-            }            
         }
     }
 }

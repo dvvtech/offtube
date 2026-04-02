@@ -1,6 +1,7 @@
 ﻿using Offtube.Api.AppStart.Extensions;
 using Offtube.Api.Configuration;
 using Offtube.Api.Services;
+using Offtube.Api.Services.Abstract;
 
 namespace Offtube.Api.AppStart
 {
@@ -38,7 +39,8 @@ namespace Offtube.Api.AppStart
             // Добавляем SignalR
             _builder.Services.AddSignalR();
 
-            // Регистрируем сервис
+            // Регистрируем сервисы
+            _builder.Services.AddScoped<IAnalyticsTrackingService, AnalyticsTrackingService>();
             _builder.Services.AddScoped<IYoutubeDownloadService, YoutubeDownloadService>();
             _builder.Services.AddHttpContextAccessor();
 
