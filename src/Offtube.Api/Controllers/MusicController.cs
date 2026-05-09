@@ -43,6 +43,12 @@ namespace Offtube.Api.Controllers
 
             await ProcessDownloadAsync(request, tempPath);
 
+            if (!Directory.Exists(tempPath))
+            {
+                _logger.LogWarning($"Directory does not exist: {tempPath}");
+                return BadRequest();
+            }
+
             var file = Directory.GetFiles(tempPath).FirstOrDefault();
             if (file == null) return BadRequest();
 
@@ -60,15 +66,18 @@ namespace Offtube.Api.Controllers
                 }
             });
 
-            return Ok(key);
+            return Ok(new UploadResponse
+            {
+                Key = key
+            });
         }
 
         private async Task ProcessDownloadAsync(UrlRequest request, string tempPath)
         {            
-            var progress = new Progress<ProgressInfo>(async info =>
+            var progress = new Progress<ProgressInfo>(info =>
             {
                 //эта строка справедлива только если разворачивать в контейнере линукс
-                info.Percentage = info.Percentage / 10;                
+                //info.Percentage = info.Percentage / 10;                
             });
 
             await _downloadService.DownloadVideoAsync(

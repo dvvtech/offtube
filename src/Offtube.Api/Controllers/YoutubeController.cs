@@ -88,6 +88,12 @@ namespace Offtube.Api.Controllers
                 progress,
                 CancellationToken.None);
 
+            if (!Directory.Exists(tempPath))
+            {
+                _logger.LogWarning($"Directory does not exist: {tempPath}");
+                return;
+            }
+
             var file = Directory.GetFiles(tempPath).FirstOrDefault();
             if (file == null) return;
 
