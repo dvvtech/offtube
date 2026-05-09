@@ -36,6 +36,37 @@ namespace Offtube.Api.Services
             }
         }
 
+        public async Task<string> GetVideoTitleAsync(string url)
+        {
+            var process = new Process
+            {
+                StartInfo = new ProcessStartInfo
+                {
+                    FileName = _ytDlpPath,
+                    Arguments = $"--get-title --no-warnings --proxy \"{_proxyUrl}\" \"{url}\"",
+                    UseShellExecute = false,
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = true,
+                    CreateNoWindow = true,
+                    StandardOutputEncoding = Encoding.UTF8,
+                    StandardErrorEncoding = Encoding.UTF8
+                }
+            };
+
+            process.Start();
+
+            string output = await process.StandardOutput.ReadToEndAsync();
+            string error = await process.StandardError.ReadToEndAsync();
+            await process.WaitForExitAsync();
+
+            if (process.ExitCode != 0)
+            {
+                throw new Exception($"Error getting video title: {error}");
+            }
+
+            return output.Trim();
+        }
+
         public async Task<List<VideoQuality>> GetQualities(string mediaUrl)
         {
             var qualities = new List<VideoQuality>();

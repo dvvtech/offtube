@@ -147,6 +147,16 @@ namespace Offtube.Api.Controllers
             return PhysicalFile(file, contentType, Path.GetFileName(file), enableRangeProcessing: true);
         }        
 
+        [HttpGet("title")]
+        public async Task<IActionResult> GetTitle([FromQuery] string url)
+        {
+            if (string.IsNullOrWhiteSpace(url))
+                return BadRequest("URL is required");
+
+            var title = await _downloadService.GetVideoTitleAsync(url);
+            return Ok(new { Title = title });
+        }
+
         [HttpGet("test")]
         public async Task<string> Test()
         {

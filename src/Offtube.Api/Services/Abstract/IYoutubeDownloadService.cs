@@ -4,6 +4,8 @@ namespace Offtube.Api.Services.Abstract
 {
     public interface IYoutubeDownloadService
     {
+        Task<string> GetVideoTitleAsync(string url);
+
         Task DownloadVideoAsync(
             string url,
             string quality,
