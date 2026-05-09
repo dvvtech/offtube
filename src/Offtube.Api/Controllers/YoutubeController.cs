@@ -52,20 +52,20 @@ namespace Offtube.Api.Controllers
             {
                 _logger.LogInformation("captcha not valid");
                 return BadRequest("reCAPTCHA validation failed");
-            }
-
-            var downloadId = Guid.NewGuid().ToString();
+            }            
 
             _ = Task.Run(async () =>
             {
-                await ProcessDownloadAsync(request, downloadId);
+                await ProcessDownloadAsync(request);
             });                        
 
-            return Accepted(new { downloadId });
+            return Accepted();
         }
 
-        private async Task ProcessDownloadAsync(DownloadRequest request, string downloadId)
+        private async Task ProcessDownloadAsync(DownloadRequest request)
         {
+            var downloadId = Guid.NewGuid().ToString();
+
             var tempPath = Path.Combine(
                 Directory.GetCurrentDirectory(),
                 "youtube_downloads",

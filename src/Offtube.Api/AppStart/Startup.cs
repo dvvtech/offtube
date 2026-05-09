@@ -59,7 +59,7 @@ namespace Offtube.Api.AppStart
             _builder.Services.Configure<GoogleRecaptchaConfig>(_builder.Configuration.GetSection(GoogleRecaptchaConfig.SectionName));
 
             var configSection = _builder.Configuration.GetSection(GoogleRecaptchaConfig.SectionName);
-            var cap = configSection.Get<GoogleRecaptchaConfig>();
+            //var cap = configSection.Get<GoogleRecaptchaConfig>();
 
             //if (cap.SecretKeyForOfftube.Length > 0)
             //{
