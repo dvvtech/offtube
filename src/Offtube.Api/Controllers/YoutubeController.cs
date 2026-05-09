@@ -54,20 +54,22 @@ namespace Offtube.Api.Controllers
                 return BadRequest("reCAPTCHA validation failed");
             }
 
+            var downloadId = Guid.NewGuid().ToString();
+
             _ = Task.Run(async () =>
             {
-                await ProcessDownloadAsync(request);
+                await ProcessDownloadAsync(request, downloadId);
             });                        
 
-            return Accepted(); // ← сразу ответ 202
+            return Accepted(new { downloadId });
         }
 
-        private async Task ProcessDownloadAsync(DownloadRequest request)
+        private async Task ProcessDownloadAsync(DownloadRequest request, string downloadId)
         {
             var tempPath = Path.Combine(
                 Directory.GetCurrentDirectory(),
                 "youtube_downloads",
-                request.DownloadId);
+                downloadId);
 
             var progress = new Progress<ProgressInfo>(async info =>
             {
@@ -97,7 +99,7 @@ namespace Offtube.Api.Controllers
                 {
                     FileName = fileInfo.Name,
                     FileSize = fileInfo.Length,
-                    DownloadUrl = $"/video/file/{request.DownloadId}"
+                    DownloadUrl = $"/video/file/{downloadId}"
                 });
 
             _ = Task.Run(async () =>
@@ -107,7 +109,7 @@ namespace Offtube.Api.Controllers
                 var dir = Path.Combine(
                     Directory.GetCurrentDirectory(),
                     "youtube_downloads",
-                    request.DownloadId);
+                    downloadId);
 
                 if (Directory.Exists(dir))
                 {
