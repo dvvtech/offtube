@@ -1,5 +1,4 @@
-﻿
-using Microsoft.Extensions.Options;
+﻿using Microsoft.Extensions.Options;
 using Offtube.Api.Configuration;
 using Offtube.Api.Models;
 using Offtube.Api.Services.Abstract;
@@ -109,15 +108,7 @@ namespace Offtube.Api.Services
             CancellationToken cancellationToken)
         {
             await _downloadLimiter.WaitAsync(cancellationToken);
-            //if (!_downloadLimiter.Wait(0))
-            //{
-            //    //throw new Exception("Сервер перегружен. Попробуйте позже.");
-            //или
-    //        await _hubContext.Clients
-    //.Client(request.ConnectionId)
-    //.SendAsync("Error", "Сервер перегружен. Попробуйте позже.");
-            //}
-
+            
             try
             {
                 Directory.CreateDirectory(outputPath);

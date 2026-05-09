@@ -29,20 +29,10 @@ namespace Offtube.Api.AppStart
             else
             {
                 _builder.Services.ConfigureCors();
-            }
-
-            // Регистрация HttpClientFactory
-            _builder.Services.AddHttpClient();
+            }            
 
             InitConfigs();
-
-            // Добавляем SignalR
-            _builder.Services.AddSignalR();
-
-            // Регистрируем сервисы
-            _builder.Services.AddScoped<IAnalyticsTrackingService, AnalyticsTrackingService>();
-            _builder.Services.AddScoped<IYoutubeDownloadService, YoutubeDownloadService>();
-            _builder.Services.AddHttpContextAccessor();
+            ConfigureServices();
 
             _builder.Services.AddControllers();
         }
@@ -55,10 +45,10 @@ namespace Offtube.Api.AppStart
             }
 
             _builder.Services.Configure<ProxyConfig>(_builder.Configuration.GetSection(ProxyConfig.SectionName));
-            //_builder.Services.Configure<AppConfig>(_builder.Configuration.GetSection(AppConfig.SectionName));
+            _builder.Services.Configure<S3CloudConfig>(_builder.Configuration.GetSection(S3CloudConfig.SectionName));
             _builder.Services.Configure<GoogleRecaptchaConfig>(_builder.Configuration.GetSection(GoogleRecaptchaConfig.SectionName));
 
-            var configSection = _builder.Configuration.GetSection(GoogleRecaptchaConfig.SectionName);
+            //var configSection = _builder.Configuration.GetSection(GoogleRecaptchaConfig.SectionName);
             //var cap = configSection.Get<GoogleRecaptchaConfig>();
 
             //if (cap.SecretKeyForOfftube.Length > 0)
@@ -66,6 +56,21 @@ namespace Offtube.Api.AppStart
             //    _logger.LogInformation("captcha: " + cap.SecretKeyForOfftube);
             //}
                 //_logger.LogInformation($"cap.len > 0, len:{cap.SecretKeyForOfftube.Length}");
+        }
+
+        private void ConfigureServices()
+        {
+            // Регистрация HttpClientFactory
+            _builder.Services.AddHttpClient();
+
+            // Добавляем SignalR
+            _builder.Services.AddSignalR();
+
+            // Регистрируем сервисы
+            _builder.Services.AddScoped<IAnalyticsTrackingService, AnalyticsTrackingService>();
+            _builder.Services.AddScoped<IYoutubeDownloadService, YoutubeDownloadService>();
+            _builder.Services.AddScoped<IStorageService, S3StorageService>();
+            _builder.Services.AddHttpContextAccessor();
         }
     }
 }

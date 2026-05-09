@@ -10,6 +10,9 @@ services:
       - ProxySettings__Ip      
       - ProxySettings__Login
       - ProxySettings__Password
+      - S3CloudConfig__TenantId      
+      - S3CloudConfig__AccessKey
+      - S3CloudConfig__SecretKey
     deploy:
       mode: replicated
       replicas: 1
@@ -36,4 +39,10 @@ secrets:
   ProxySettings__Login:
     external: true
   ProxySettings__Password:
+    external: true
+  S3CloudConfig__TenantId:
+    external: true
+  S3CloudConfig__AccessKey:
+    external: true
+  S3CloudConfig__SecretKey:
     external: true
