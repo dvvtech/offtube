@@ -54,21 +54,16 @@ namespace Offtube.Api.Controllers
 
             var fileInfo = new FileInfo(file);
 
-            var key = await _storageService.UploadFileAsync(fileInfo);
+            var objectKey = await _storageService.UploadFileAsync(fileInfo);
 
-            _ = Task.Run(async () =>
+            if (Directory.Exists(tempPath))
             {
-                await Task.Delay(TimeSpan.FromMinutes(1));
-
-                if (Directory.Exists(tempPath))
-                {
-                    Directory.Delete(tempPath, true);
-                }
-            });
+                Directory.Delete(tempPath, true);
+            }
 
             return Ok(new UploadResponse
             {
-                Key = key
+                ObjectKey = objectKey
             });
         }
 

@@ -2,6 +2,6 @@
 {
     public class UploadResponse
     {
-        public string Key { get; set; }
+        public string ObjectKey { get; set; }
     }
 }
