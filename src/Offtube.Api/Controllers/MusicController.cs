@@ -63,7 +63,8 @@ namespace Offtube.Api.Controllers
 
             return Ok(new UploadResponse
             {
-                ObjectKey = objectKey
+                ObjectKey = objectKey,
+                TrackTitle = fileInfo.Name
             });
         }
 
