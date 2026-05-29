@@ -68,6 +68,55 @@ namespace Offtube.Api.Controllers
             });
         }
 
+        [HttpPost("upload-from-file")]
+        [RequestSizeLimit(100_000_000)]
+        public async Task<IActionResult> UploadFromFile([FromForm] IFormFile? file)
+        {
+            if (file == null || file.Length == 0)
+            {
+                return BadRequest("File is required");
+            }
+
+            var extension = Path.GetExtension(file.FileName);
+            var objectKey = $"music/uploads/{Guid.NewGuid():N}{extension}";
+            var tempPath = Path.Combine(
+                Directory.GetCurrentDirectory(),
+                "music_uploads",
+                Guid.NewGuid().ToString("N"));
+
+            Directory.CreateDirectory(tempPath);
+
+            var safeFileName = string.IsNullOrWhiteSpace(file.FileName)
+                ? $"track{extension}"
+                : Path.GetFileName(file.FileName);
+
+            var localPath = Path.Combine(tempPath, safeFileName);
+
+            try
+            {
+                await using (var stream = System.IO.File.Create(localPath))
+                {
+                    await file.CopyToAsync(stream);
+                }
+
+                var fileInfo = new FileInfo(localPath);
+                var uploadedObjectKey = await _storageService.UploadFileAsync(fileInfo, objectKey);
+
+                return Ok(new UploadResponse
+                {
+                    ObjectKey = uploadedObjectKey,
+                    TrackTitle = safeFileName
+                });
+            }
+            finally
+            {
+                if (Directory.Exists(tempPath))
+                {
+                    Directory.Delete(tempPath, true);
+                }
+            }
+        }
+
         private async Task ProcessDownloadAsync(UrlRequest request, string tempPath)
         {            
             var progress = new Progress<ProgressInfo>(info =>
