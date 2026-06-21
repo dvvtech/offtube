@@ -155,7 +155,7 @@ namespace Offtube.Api.Services
             await process.WaitForExitAsync();
 
             if (process.ExitCode != 0)
-                return "bestaudio";
+                return "bestaudio/best";
 
             var audioFormats = new List<(string id, string ext)>();
 
@@ -172,7 +172,7 @@ namespace Offtube.Api.Services
             }
 
             if (audioFormats.Count == 0)
-                return "bestaudio";
+                return "bestaudio/best";
 
             static int ExtensionPriority(string ext) => ext switch
             {
@@ -257,7 +257,7 @@ namespace Offtube.Api.Services
             args += "--no-warnings ";
             args += $"--proxy \"{_proxyUrl}\" ";
 
-            if (quality == "bestaudio")
+            if (quality == "bestaudio" || quality == "bestaudio/best")
                 args += "-x --audio-format mp3 ";
 
             args += $"\"{url}\"";
