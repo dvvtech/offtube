@@ -41,7 +41,8 @@ namespace Offtube.Api.Controllers
                 "youtube_downloads",
                 downloadId);
 
-            await ProcessDownloadAsync(request, tempPath);
+            var format = await _downloadService.GetBestFormatAsync(request.Url);
+            await ProcessDownloadAsync(request, tempPath, format);
 
             if (!Directory.Exists(tempPath))
             {
@@ -117,7 +118,7 @@ namespace Offtube.Api.Controllers
             }
         }
 
-        private async Task ProcessDownloadAsync(UrlRequest request, string tempPath)
+        private async Task ProcessDownloadAsync(UrlRequest request, string tempPath, string quality)
         {            
             var progress = new Progress<ProgressInfo>(info =>
             {
@@ -127,7 +128,7 @@ namespace Offtube.Api.Controllers
 
             await _downloadService.DownloadVideoAsync(
                 request.Url,
-                "bestaudio",
+                quality,
                 tempPath,
                 progress,
                 CancellationToken.None);            

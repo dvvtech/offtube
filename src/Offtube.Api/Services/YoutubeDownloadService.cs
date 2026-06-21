@@ -131,6 +131,64 @@ namespace Offtube.Api.Services
             return null;
         }
 
+        public async Task<string> GetBestFormatAsync(string url)
+        {
+            var process = new Process
+            {
+                StartInfo = new ProcessStartInfo
+                {
+                    FileName = _ytDlpPath,
+                    Arguments = $"--list-formats --no-warnings --proxy \"{_proxyUrl}\" \"{url}\"",
+                    UseShellExecute = false,
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = true,
+                    CreateNoWindow = true,
+                    StandardOutputEncoding = Encoding.UTF8,
+                    StandardErrorEncoding = Encoding.UTF8
+                }
+            };
+
+            process.Start();
+
+            string output = await process.StandardOutput.ReadToEndAsync();
+            string error = await process.StandardError.ReadToEndAsync();
+            await process.WaitForExitAsync();
+
+            if (process.ExitCode != 0)
+                return "bestaudio";
+
+            var audioFormats = new List<(string id, string ext)>();
+
+            foreach (var line in output.Split('\n', StringSplitOptions.RemoveEmptyEntries))
+            {
+                if (!line.Contains("audio only", StringComparison.OrdinalIgnoreCase))
+                    continue;
+
+                var match = System.Text.RegularExpressions.Regex.Match(line.Trim(), @"^(\d+)\s+(\w+)");
+                if (match.Success)
+                {
+                    audioFormats.Add((match.Groups[1].Value, match.Groups[2].Value.ToLowerInvariant()));
+                }
+            }
+
+            if (audioFormats.Count == 0)
+                return "bestaudio";
+
+            static int ExtensionPriority(string ext) => ext switch
+            {
+                "m4a" => 0,
+                "webm" => 1,
+                _ => 2
+            };
+
+            var best = audioFormats
+                .OrderBy(f => ExtensionPriority(f.ext))
+                .ThenByDescending(f => int.TryParse(f.id, out var id) ? id : 0)
+                .First();
+
+            return best.id;
+        }
+
         public async Task DownloadVideoAsync(
             string url,
             string quality,

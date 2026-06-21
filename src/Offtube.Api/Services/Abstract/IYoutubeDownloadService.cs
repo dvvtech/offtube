@@ -6,6 +6,8 @@ namespace Offtube.Api.Services.Abstract
     {
         Task<string> GetVideoTitleAsync(string url);
 
+        Task<string> GetBestFormatAsync(string url);
+
         Task DownloadVideoAsync(
             string url,
             string quality,
