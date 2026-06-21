@@ -164,7 +164,7 @@ namespace Offtube.Api.Services
                 if (!line.Contains("audio only", StringComparison.OrdinalIgnoreCase))
                     continue;
 
-                var match = System.Text.RegularExpressions.Regex.Match(line.Trim(), @"^(\d+)\s+(\w+)");
+                var match = System.Text.RegularExpressions.Regex.Match(line.Trim(), @"^(\S+)\s+(\w+)");
                 if (match.Success)
                 {
                     audioFormats.Add((match.Groups[1].Value, match.Groups[2].Value.ToLowerInvariant()));
@@ -181,9 +181,15 @@ namespace Offtube.Api.Services
                 _ => 2
             };
 
+            static int FormatIdNumber(string id)
+            {
+                var numMatch = System.Text.RegularExpressions.Regex.Match(id, @"(\d+)$");
+                return numMatch.Success ? int.Parse(numMatch.Groups[1].Value) : 0;
+            }
+
             var best = audioFormats
                 .OrderBy(f => ExtensionPriority(f.ext))
-                .ThenByDescending(f => int.TryParse(f.id, out var id) ? id : 0)
+                .ThenByDescending(f => FormatIdNumber(f.id))
                 .First();
 
             return best.id;
