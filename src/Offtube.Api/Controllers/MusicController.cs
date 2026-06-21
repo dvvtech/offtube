@@ -70,7 +70,7 @@ namespace Offtube.Api.Controllers
 
         [HttpPost("upload-from-file")]
         [RequestSizeLimit(100_000_000)]
-        public async Task<IActionResult> UploadFromFile([FromForm] IFormFile? file)
+        public async Task<IActionResult> UploadFromFile(IFormFile? file)
         {
             if (file == null || file.Length == 0)
             {
