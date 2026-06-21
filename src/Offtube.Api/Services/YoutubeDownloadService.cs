@@ -170,7 +170,7 @@ namespace Offtube.Api.Services
                     audioFormats.Add((match.Groups[1].Value, match.Groups[2].Value.ToLowerInvariant()));
                 }
             }
-
+            
             if (audioFormats.Count == 0)
                 return "bestaudio/best";
 
@@ -218,7 +218,7 @@ namespace Offtube.Api.Services
                         StandardErrorEncoding = Encoding.UTF8
                     }
                 };
-
+                
                 process.ErrorDataReceived += (sender, e) =>
                 {
                     if (!string.IsNullOrEmpty(e.Data))
@@ -238,7 +238,11 @@ namespace Offtube.Api.Services
                 await process.WaitForExitAsync(cancellationToken);
 
                 if (process.ExitCode != 0)
-                    throw new Exception("Ошибка при скачивании видео");
+                {
+                    var downloadedFiles = Directory.GetFiles(outputPath);
+                    if (downloadedFiles.Length == 0)
+                        throw new Exception("Ошибка при скачивании видео");
+                }
             }
             finally
             {
