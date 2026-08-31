@@ -19,8 +19,23 @@ namespace Offtube.Api.Services
             IOptions<Offtube.Api.Configuration.ProxyConfig> options,
             IWebHostEnvironment env)
         {
-            var config = options.Value;            
-            _proxyUrl = $"http://{config.Login}:{config.Password}@{config.Url}";            
+            var config = options.Value;
+            var host = config.Url?.Trim() ?? string.Empty;
+            if (host.StartsWith("http://", StringComparison.OrdinalIgnoreCase))
+                host = host["http://".Length..];
+            else if (host.StartsWith("https://", StringComparison.OrdinalIgnoreCase))
+                host = host["https://".Length..];
+            host = host.TrimEnd('/');
+
+            var credentials = string.Empty;
+            if (!string.IsNullOrEmpty(config.Login))
+            {
+                credentials = string.IsNullOrEmpty(config.Password)
+                    ? $"{Uri.EscapeDataString(config.Login)}@"
+                    : $"{Uri.EscapeDataString(config.Login)}:{Uri.EscapeDataString(config.Password)}@";
+            }
+
+            _proxyUrl = string.IsNullOrEmpty(host) ? string.Empty : $"http://{credentials}{host}";
 
             if (env.IsDevelopment())
             {
