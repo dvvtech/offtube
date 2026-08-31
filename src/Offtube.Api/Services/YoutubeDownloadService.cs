@@ -20,7 +20,7 @@ namespace Offtube.Api.Services
             IWebHostEnvironment env)
         {
             var config = options.Value;            
-            _proxyUrl = config.Url;
+            _proxyUrl = $"http://{config.Login}:{config.Password}@{config.Url}";            
 
             if (env.IsDevelopment())
             {
