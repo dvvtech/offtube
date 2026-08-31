@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Options;
+﻿using Amazon.Util;
+using Microsoft.Extensions.Options;
 using Offtube.Api.Configuration;
 using Offtube.Api.Models;
 using Offtube.Api.Services.Abstract;
@@ -15,11 +16,11 @@ namespace Offtube.Api.Services
         private static readonly SemaphoreSlim _downloadLimiter = new SemaphoreSlim(3); // ← максимум 3 загрузки
 
         public YoutubeDownloadService(            
-            IOptions<ProxyConfig> options,
+            IOptions<Offtube.Api.Configuration.ProxyConfig> options,
             IWebHostEnvironment env)
         {
             var config = options.Value;            
-            _proxyUrl = $"http://{config.Login}:{config.Password}@{config.Ip}:{config.Port}";
+            _proxyUrl = config.Url;
 
             if (env.IsDevelopment())
             {

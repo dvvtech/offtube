@@ -7,9 +7,7 @@ services:
       - public-network5
     secrets:
       - GoogleRecaptcha__SecretKeyForOfftube
-      - ProxySettings__Ip      
-      - ProxySettings__Login
-      - ProxySettings__Password
+      - ProxyConfig__Password      
       - S3CloudConfig__TenantId      
       - S3CloudConfig__AccessKey
       - S3CloudConfig__SecretKey
@@ -34,11 +32,7 @@ networks:
 secrets:
   GoogleRecaptcha__SecretKeyForOfftube:
     external: true  
-  ProxySettings__Ip:
-    external: true
-  ProxySettings__Login:
-    external: true
-  ProxySettings__Password:
+  ProxyConfig__Password:
     external: true
   S3CloudConfig__TenantId:
     external: true
